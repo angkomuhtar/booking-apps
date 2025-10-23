@@ -1,0 +1,117 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                    AYO BOOKING SYSTEM                                ║
+║              Court Booking Application (v1.0.0)                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📋 PROJECT OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Aplikasi web booking lapangan badminton dan padel, terinspirasi dari
+ayo.co.id. Dibangun dengan Next.js 15, Prisma, PostgreSQL, dan Auth.js.
+
+🛠️  TECH STACK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Frontend:
+  • Next.js 15 (App Router + Turbopack)
+  • React 19
+  • TypeScript 5
+  • Tailwind CSS v4
+  • shadcn/ui components
+
+Backend:
+  • Next.js API Routes
+  • Auth.js v5 (Credentials Provider)
+  • Prisma ORM
+  • PostgreSQL
+
+Forms & Validation:
+  • React Hook Form
+  • Zod Schema Validation
+
+📦 PROJECT STATS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Total Files: 28+ TypeScript/React files
+• Lines of Code: ~2800 lines
+• Components: 13 shadcn/ui components
+• Pages: 7 main pages
+• API Routes: 2 endpoints
+• Database Models: 4 models
+
+✨ FEATURES IMPLEMENTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+User Features:
+  ✓ User registration & login
+  ✓ Browse venues and courts
+  ✓ View booking history
+  ✓ Role-based access (USER/ADMIN)
+
+Admin Features:
+  ✓ Admin dashboard with statistics
+  ✓ Manage venues (list view)
+  ✓ Manage bookings (list view)
+  ✓ View all users
+
+Developer Features:
+  ✓ TypeScript type checking
+  ✓ ESLint code linting
+  ✓ Database seeding
+  ✓ Comprehensive documentation
+
+📁 KEY FILES & DIRECTORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AGENTS.md         → Agent/developer guidelines
+README.md         → Full project documentation
+SETUP.md          → Quick setup instructions
+TODO.md           → Feature roadmap
+
+app/
+  ├── page.tsx              → Home page
+  ├── login/                → Login page
+  ├── register/             → Registration page
+  ├── bookings/             → User bookings
+  ├── venues/               → Venue listings
+  ├── admin/                → Admin dashboard
+  └── api/auth/             → Auth API routes
+
+prisma/
+  ├── schema.prisma         → Database schema
+  └── seed.ts               → Seed data script
+
+🚀 QUICK START
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. npm install
+2. cp .env.example .env (configure DATABASE_URL & AUTH_SECRET)
+3. npm run db:generate
+4. npm run db:push
+5. npx tsx prisma/seed.ts
+6. npm run dev
+
+📚 DOCUMENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+See SETUP.md for detailed setup instructions
+See README.md for full documentation
+See TODO.md for feature roadmap
+See AGENTS.md for code conventions
+
+🔑 DEFAULT CREDENTIALS (After Seeding)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Admin:
+  Email: admin@ayo.com
+  Password: admin123
+
+User:
+  Email: user@ayo.com
+  Password: user123
+
+🎯 NEXT STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+High Priority:
+  • Add venue detail page with booking form
+  • Implement booking creation API
+  • Add admin CRUD for venues/courts
+  • Integrate payment gateway
+
+See TODO.md for complete roadmap
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Built with ❤️ using Next.js, Prisma, and Auth.js
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
