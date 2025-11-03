@@ -217,4 +217,27 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  .lineArray {
+    stroke-dasharray: 1600;
+    stroke-dashoffset: 1600;
+  }
+  .nav-menu {
+    @apply items-center gap-6 text-sm font-medium hidden lg:flex;
+  }
+}
+
+@theme {
+  --animate-dasharray: dashAnimation var(--tw-animate-duration, 3s) ease-in-out;
+
+  @keyframes dashAnimation {
+    from {
+      stroke-dasharray: 1600;
+      stroke-dashoffset: 1600;
+    }
+
+    to {
+      stroke-dasharray: 2500;
+      stroke-dashoffset: 1600;
+    }
+  }
 }

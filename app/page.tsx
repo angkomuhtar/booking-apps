@@ -14,7 +14,35 @@ import {
   Phone,
   Mail,
   Star,
+  User2,
+  ShoppingBag,
+  ShoppingCart,
+  BadgeDollarSign,
+  Menu,
+  X,
+  SearchIcon,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+
+import { motion } from "motion/react";
+import CustButton from "@/components/custom-ui/cust-button";
 
 export default async function Home() {
   const session = await auth();
@@ -25,106 +53,30 @@ export default async function Home() {
     take: 6,
   });
 
+  console.log("isi session", session);
+
   return (
     <div className='min-h-screen bg-background font-sans'>
-      {/* <div className='bg-secondary text-secondary-foreground py-2 text-sm'>
-        <div className='container mx-auto px-4 flex justify-between items-center'>
-          <div className='flex items-center gap-4'>
-            {!session && (
-              <>
-                <Link
-                  href='/login'
-                  className='hover:text-primary transition-colors'>
-                  Sign In
-                </Link>
-                <span>/</span>
-                <Link
-                  href='/register'
-                  className='hover:text-primary transition-colors'>
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </div> */}
-
-      <header className='bg-white border-b sticky top-0 z-50 shadow-sm'>
+      {/* navigation */}
+      <header className='bg-white border-b sticky top-0 z-50 shadow-xs'>
         <div className='container px-4'>
           <div className='flex justify-between items-center py-4'>
             <Link href='/' className='flex items-center gap-2 group'>
               <div className='bg-primary p-2.5 rounded-lg group-hover:scale-105 transition-transform'>
-                <Trophy className='h-6 w-6 text-primary-foreground' />
+                <BadgeDollarSign className='h-6 w-6 text-primary-foreground' />
               </div>
               <div>
-                <h1 className='text-2xl font-bold text-secondary'>
-                  Ayo Booking
-                </h1>
+                <h1 className='text-2xl font-bold text-secondary'>Booking</h1>
                 <p className='text-xs text-muted-foreground'>
-                  Court Reservation System
+                  Court Reservation
                 </p>
               </div>
             </Link>
 
-            <div className='hidden md:flex flex-1 max-w-xl mx-8'>
-              <div className='relative w-full'>
-                <input
-                  type='text'
-                  placeholder='Search venues, locations...'
-                  className='w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20'
-                />
-                <Search className='absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground' />
+            <nav className='nav-menu'>
+              <div className='sm:hidden mb-4'>
+                <X className='w-6 h-6 ' />
               </div>
-            </div>
-
-            <nav className='flex gap-3 items-center'>
-              {session ? (
-                <>
-                  <div className='text-sm font-medium hidden sm:block'>
-                    Welcome,{" "}
-                    <span className='text-primary'>{session.user.name}</span>
-                  </div>
-                  {session.user.role === "ADMIN" && (
-                    <Button asChild variant='outline' size='sm'>
-                      <Link href='/admin'>Admin Panel</Link>
-                    </Button>
-                  )}
-                  <Button asChild variant='outline' size='sm'>
-                    <Link href='/bookings'>My Bookings</Link>
-                  </Button>
-                  <form action='/api/auth/signout' method='POST'>
-                    <Button type='submit' variant='ghost' size='sm'>
-                      Logout
-                    </Button>
-                  </form>
-                </>
-              ) : (
-                <>
-                  <Button
-                    asChild
-                    variant='ghost'
-                    size='sm'
-                    className='hidden sm:inline-flex'>
-                    <Link href='/login'>Login</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size='sm'
-                    className='bg-primary hover:bg-primary/90'>
-                    <Link href='/register'>Get Started</Link>
-                  </Button>
-                </>
-              )}
-            </nav>
-          </div>
-
-          <div className='border-t py-3'>
-            <nav className='flex items-center gap-6 text-sm font-medium'>
-              <Link
-                href='/'
-                className='text-primary hover:text-primary/80 transition-colors'>
-                Home
-              </Link>
               <Link
                 href='/venues'
                 className='hover:text-primary transition-colors'>
@@ -142,21 +94,111 @@ export default async function Home() {
                 Contact
               </Link>
             </nav>
+
+            <nav className='flex sm:gap-6 gap-3 items-center min-h-10'>
+              <Link href='/venues' className='flex items-center'>
+                <ShoppingCart className='w-6 h-6 ' />
+              </Link>
+              <div className='w-[1px] bg-border h-5'></div>
+              {session ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className='flex items-center cursor-pointer'>
+                      <User2 className='sm:h-8 sm:w-8 text-white transition-colors bg-slate-700 rounded-full p-0.5' />
+                      <div className='sm:flex flex-col ml-2 hidden'>
+                        <p className='font-light text-[10px]'>Welcome,</p>
+                        <p className='font-semibold text-sm leading-none'>
+                          {session.user?.name}
+                        </p>
+                      </div>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side='top' sideOffset={10} align='end'>
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem>
+                        Profile
+                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        Billing
+                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        Settings
+                        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        Keyboard shortcuts
+                        <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      Log out
+                      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href='/login' className='flex items-center'>
+                  <User2 className='sm:h-8 sm:w-8 text-muted-foreground hover:text-primary transition-colors' />
+                  <div className='flex flex-col ml-2'>
+                    <p className='font-light text-[10px]'>Welcome,</p>
+                    <p className='font-semibold text-sm leading-none'>
+                      Login / Register
+                    </p>
+                  </div>
+                </Link>
+              )}
+
+              <div className='w-px bg-border h-5 lg:hidden'></div>
+              <Sheet>
+                <SheetTrigger>
+                  <Menu className='w-6 h-6 cursor-pointer lg:hidden' />
+                </SheetTrigger>
+                <SheetContent className='w-[400px] sm:w-[540px]'>
+                  <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
+                  </SheetHeader>
+                </SheetContent>
+              </Sheet>
+            </nav>
           </div>
         </div>
       </header>
 
-      <section className='bg-gradient-to-r from-primary to-primary/80 text-primary-foreground'>
-        <div className='container mx-auto px-4 py-16 md:py-24'>
-          <div className='grid md:grid-cols-2 gap-8 items-center'>
+      {/* header Banner */}
+      <section className='bg-[url(/image/bg-2.png)] bg-cover bg-right bg-no-repeat relative'>
+        <div className='absolute top-0 sm:right-[30%] lg:right-[26%] h-full overflow-hidden z-10'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className='object-contain w-full h-full sm:h-[110%] overflow-hidden'
+            viewBox='0 0 649 578'>
+            <path
+              fill='#FFF'
+              d='m-225.5 154.7 358.45 456.96c7.71 9.83 21.92 11.54 31.75 3.84l456.96-358.45c9.83-7.71 11.54-21.92 3.84-31.75L267.05-231.66c-7.71-9.83-21.92-11.54-31.75-3.84l-456.96 358.45c-9.83 7.71-11.54 21.92-3.84 31.75z'
+            />
+            <path
+              fill='none'
+              stroke='#222529'
+              strokeMiterlimit='10'
+              strokeWidth='1.5'
+              d='m416-21 202.27 292.91c5.42 7.85 3.63 18.59-4.05 24.25L198 603'
+              className='lineArray animate-dasharray animation-delay-200 duration-500'
+            />
+          </svg>
+        </div>
+        <div className='container mx-auto px-4 py-16 md:py-24 min-h-[530px] z-20 relative'>
+          <div className='grid md:grid-cols-2 gap-8 items-center w-5/6 sm:w-full'>
             <div>
-              <Badge className='bg-white/20 text-white hover:bg-white/30 mb-4'>
+              <Badge className='bg-primary text-primary-foreground font-bold mb-4'>
                 Special Offer - 20% OFF
               </Badge>
-              <h2 className='text-4xl md:text-5xl font-bold mb-4'>
-                Book Your Court Today
+              <h2 className='text-4xl md:text-5xl font-bold mb-4 text-black'>
+                Super Sport Community App
               </h2>
-              <p className='text-lg text-primary-foreground/90 mb-6'>
+              <p className='text-lg mb-6'>
                 Premium badminton & padel courts available for booking. Easy
                 online reservation, instant confirmation.
               </p>
@@ -165,65 +207,78 @@ export default async function Home() {
                   asChild
                   size='lg'
                   variant='secondary'
-                  className='shadow-lg'>
+                  className='shadow-lg bg-primary hover:bg-primary/50 font-bold'>
                   <Link href='/venues' className='gap-2'>
                     Browse Venues
                     <ChevronRight className='h-4 w-4' />
                   </Link>
                 </Button>
-                <Button
+                {/* <Button
                   asChild
                   size='lg'
                   variant='outline'
                   className='bg-transparent border-white text-white hover:bg-white hover:text-primary'>
                   <Link href='#how-it-works'>Learn More</Link>
-                </Button>
+                </Button> */}
               </div>
             </div>
-            <div className='hidden md:block'>
-              <div className='bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20'>
-                <div className='space-y-4'>
-                  <div className='flex items-center gap-4'>
-                    <div className='w-12 h-12 rounded-full bg-white/20 flex items-center justify-center'>
-                      <Trophy className='h-6 w-6' />
-                    </div>
-                    <div>
-                      <h4 className='font-semibold'>Premium Courts</h4>
-                      <p className='text-sm text-primary-foreground/80'>
-                        Top-quality facilities
-                      </p>
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    <div className='w-12 h-12 rounded-full bg-white/20 flex items-center justify-center'>
-                      <Clock className='h-6 w-6' />
-                    </div>
-                    <div>
-                      <h4 className='font-semibold'>Instant Booking</h4>
-                      <p className='text-sm text-primary-foreground/80'>
-                        Reserve in seconds
-                      </p>
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-4'>
-                    <div className='w-12 h-12 rounded-full bg-white/20 flex items-center justify-center'>
-                      <Star className='h-6 w-6' />
-                    </div>
-                    <div>
-                      <h4 className='font-semibold'>Best Prices</h4>
-                      <p className='text-sm text-primary-foreground/80'>
-                        Competitive rates guaranteed
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div className='hidden md:block'></div>
           </div>
         </div>
       </section>
 
-      <section className='py-8 bg-muted/50'>
+      <section className='py-24 bg-muted/50'>
+        <div className='container px-4'>
+          <div>
+            <h3 className='text-3xl font-bold'>Find Your Perfect Court</h3>
+            <p className='text-sm text-muted-foreground mb-10'>
+              Search and book badminton & padel courts in just a few clicks
+            </p>
+          </div>
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-6 text-center'>
+            <div className='rounded-full px-6 py-4 bg-white hover:border-primary/50 transition-all shadow-sm'>
+              <select
+                name='sport'
+                id='sport'
+                defaultValue=''
+                className='w-full border-0 focus-visible:outline-0 font-light text-sm'>
+                <option disabled value=''>
+                  Jenis Olahraga
+                </option>
+                <option value='badminton'>Badminton</option>
+                <option value='padel'>Padel</option>
+              </select>
+            </div>
+            <div className='rounded-full px-6 py-4 bg-white hover:border-primary/50 transition-all shadow-sm'>
+              <select
+                name='sport'
+                id='sport'
+                className='w-full border-0 focus-visible:outline-0 font-light text-sm'>
+                <option disabled value=''>
+                  Pilih Lokasi
+                </option>
+                <option value='Samarinda'>Samarinda</option>
+                <option value='Balikpapan'>Balikpapan</option>
+              </select>
+            </div>
+            <div className='rounded-full px-6 py-4 bg-white hover:border-primary/50 transition-all shadow-sm'>
+              <select
+                name='sport'
+                id='sport'
+                className='w-full border-0 focus-visible:outline-0 font-light text-sm'>
+                <option disabled value=''>
+                  Pilih Olahraga
+                </option>
+                <option value='badminton'>Badminton</option>
+              </select>
+            </div>
+            {/* <LiquidButton>Liquid Button</LiquidButton> */}
+            <CustButton />
+          </div>
+        </div>
+      </section>
+
+      {/* <section className='py-8 bg-muted/50'>
         <div className='container mx-auto px-4'>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-6 text-center'>
             <div>
@@ -250,7 +305,7 @@ export default async function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <main className='container mx-auto px-4 py-12'>
         <section className='mb-16' id='how-it-works'>
