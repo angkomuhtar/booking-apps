@@ -7,18 +7,17 @@ import { SearchIcon } from "lucide-react";
 const CustButton = () => {
   return (
     <motion.button
-      whileTap={{ scale: 0.95 }}
+      initial='idle'
+      whileHover='hover'
+      animate='idle'
       variants={{
-        divhover: {
+        hover: {
           scale: 1.05,
-          transition: { delay: 0.3, ease: "easeInOut" },
         },
       }}
-      whileHover={["hover"]}
       className='group relative rounded-full px-6 py-4 border-2 border-primary text-primary shadow-sm flex items-center justify-center gap-2 font-extrabold cursor-pointer overflow-hidden'>
       <motion.div
         className='absolute bottom-0 z-0 left-0 bg-primary'
-        initial='idle'
         variants={{
           idle: {
             width: "0%",

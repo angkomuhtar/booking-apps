@@ -26,6 +26,9 @@ model Venue {
   description String?
   address     String
   city        String
+  province    String?
+  location    String?
+  rules       String?
   imageUrl    String?
   facilities  String[]
   createdAt   DateTime       @default(now())
@@ -35,16 +38,19 @@ model Venue {
 }
 
 model Court {
-  id           String    @id @default(cuid())
-  name         String
-  type         CourtType
-  pricePerHour Int
-  isActive     Boolean   @default(true)
-  venueId      String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  bookings     Booking[]
-  venue        Venue     @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  id              String         @id @default(cuid())
+  name            String
+  type            CourtType
+  floorType       String?
+  sessionDuration Int            @default(60)
+  pricePerHour    Int
+  isActive        Boolean        @default(true)
+  venueId         String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  bookings        Booking[]
+  pricing         CourtPricing[]
+  venue           Venue          @relation(fields: [venueId], references: [id], onDelete: Cascade)
 
   @@index([venueId])
 }
@@ -84,6 +90,22 @@ model VenueAdmin {
   @@index([venueId])
 }
 
+model CourtPricing {
+  id        String   @id @default(cuid())
+  courtId   String
+  dayType   DayType
+  startTime String
+  endTime   String
+  price     Int
+  discount  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  court     Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
+
+  @@index([courtId])
+  @@index([dayType])
+}
+
 enum Role {
   USER
   VENUE_ADMIN
@@ -93,6 +115,13 @@ enum Role {
 enum CourtType {
   BADMINTON
   PADEL
+  MINISOCCER
+}
+
+enum DayType {
+  WEEKDAY
+  WEEKEND
+  HOLIDAY
 }
 
 enum BookingStatus {

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Poppins, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import App from "next/app";
+import AppFooter from "@/components/app-footer";
+import AppNav from "@/components/app-navigation";
 
 const poppins = Poppins({
   variable: "--font-poppins",
