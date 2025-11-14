@@ -82,7 +82,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   console.log("user from Nav", user);
 
   return (
-    <Sidebar collapsible='icon' {...props}>
+    <Sidebar collapsible='icon' {...props} className='bg-white'>
       <SidebarHeader>
         <TeamSwitcher teams={teams} />
       </SidebarHeader>

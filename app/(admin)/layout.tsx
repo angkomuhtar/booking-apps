@@ -16,6 +16,31 @@ import {
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import React from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User2 } from "lucide-react";
+import { Icon } from "@iconify/react";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
@@ -42,9 +67,9 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
           email: session.user.email ?? "",
         }}
       />
-      <SidebarInset>
-        <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
-          <div className='flex items-center gap-2 px-4'>
+      <SidebarInset className='bg-white'>
+        <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 px-6'>
+          <div className='flex items-center gap-2 flex-1'>
             <SidebarTrigger className='-ml-1' />
             <Separator
               orientation='vertical'
@@ -62,10 +87,45 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className='flex items-center cursor-pointer'>
+                <div className='sm:flex flex-col mr-2 hidden'>
+                  <p className='font-light text-[10px]'>Welcome,</p>
+                  <p className='font-semibold text-sm leading-none'>User</p>
+                </div>
+                <User2 className='size-8 text-white transition-colors bg-slate-700 rounded-full p-0.5' />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side='top' sideOffset={10} align='end'>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  Profile
+                  <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Billing
+                  <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Settings
+                  <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Keyboard shortcuts
+                  <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                Log out
+                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
-        <div className='flex flex-1 flex-col gap-4 p-4 pt-0 font-sans'>
-          {children}
-        </div>
+        {children}
       </SidebarInset>
     </SidebarProvider>
   );

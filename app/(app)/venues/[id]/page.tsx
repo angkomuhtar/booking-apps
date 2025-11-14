@@ -40,6 +40,27 @@ import { Icon } from "@iconify/react";
 import VenueReview from "@/components/venue-review";
 import moment from "moment";
 import "moment/locale/id"; // Tambahkan ini
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { addDays } from "date-fns";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const page = () => {
   const images = [
@@ -282,22 +303,125 @@ const page = () => {
           </div>
           <h3 className='text-3xl font-semibold flex-1'>Pilihan Lapangan</h3>
         </div>
-        <div className='grid grid-cols-5 gap-4 mt-6 bg-white p-4 rounded-lg'>
-          <div className='col-span-4 grid grid-cols-7 gap-2'>
+        <div className='grid grid-cols-7 gap-4 mt-6 mb-4 items-stretch'>
+          <div className='col-span-5 grid grid-cols-7 gap-2'>
             {Array.from({ length: 7 }).map((_, index) => (
               <div
                 key={index}
-                className='border rounded-lg overflow-hidden cursor-pointer flex flex-col items-center justify-center py-2'>
-                <h6 className='text-sm font-light text-muted-foreground text-center'>
+                className='border border-primary rounded-lg overflow-hidden cursor-pointer flex flex-col items-center justify-center py-1 bg-white'>
+                <h6 className='text-xs font-light text-muted-foreground text-center'>
                   {moment().add(index, "days").format("dddd")}
                 </h6>
-                <p className='font-semibold text-sm'>
-                  {moment().add(index, "days").format("DD MMM YYYY")}
+                <p className='font-semibold'>
+                  {moment().add(index, "days").format("DD MMM")}
                 </p>
               </div>
             ))}
           </div>
-          <div></div>
+          <div className='col-span-2 flex justify-center items-center gap-4'>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className='border border-primary text-primary bg-white p-2 rounded-md font-semibold cursor-pointer'>
+                  <Icon icon='ion:calendar-outline' className='size-5' />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                side='bottom'
+                align='end'
+                sideOffset={10}
+                className='p-0 '>
+                <Calendar
+                  mode='single'
+                  captionLayout='dropdown'
+                  className='w-full gap-2'
+                  buttonVariant='outline'
+                  disabled={[
+                    { before: new Date(), after: addDays(new Date(), 7) },
+                  ]}
+                />
+              </PopoverContent>
+            </Popover>
+            <button className='bg-white border border-primary text-primary px-4 py-2 rounded-md w-full flex-1 font-semibold cursor-pointer'>
+              <Icon
+                icon='mdi:filter-outline'
+                className='size-5 inline-block mr-2'
+              />
+              <span>Filter & Sort</span>
+            </button>
+          </div>
+        </div>
+        <div className='grid grid-cols-3 gap-4 items-start mb-4'>
+          <Carousel className='w-full'>
+            <CarouselContent>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <CarouselItem key={index}>
+                  <div className='p-1'>
+                    <img
+                      src='/image/venue-6.jpg'
+                      alt=''
+                      className='w-full rounded-md aspect-video object-cover'
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className='left-1 p-1 cursor-pointer hover:bg-gray-200 rounded-md' />
+            <CarouselNext className='right-1 p-1 cursor-pointer hover:bg-gray-200 rounded-md' />
+          </Carousel>
+          <div className='col-span-2'>
+            <h3 className='text-xl font-semibold mb-1'>Lapangan A</h3>
+            <span className='text-sm font-medium text-muted-foreground'>
+              Indoor Hard Court
+            </span>
+            <div className='grid gap-2 mt-2'>
+              <div className='flex items-center space-x-2'>
+                <Icon icon='cil:tennis' className='size-5 text-primary' />
+                <span className='text-sm font-medium text-muted-foreground'>
+                  Tennis
+                </span>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <Icon icon='cil:tennis' className='size-5 text-primary' />
+                <span className='text-sm font-medium text-muted-foreground'>
+                  Indoor
+                </span>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <Icon icon='cil:tennis' className='size-5 text-primary' />
+                <span className='text-sm font-medium text-muted-foreground'>
+                  Hard Court
+                </span>
+              </div>
+            </div>
+            <Accordion
+              type='single'
+              collapsible
+              className='w-full'
+              defaultValue='item-1'>
+              <AccordionItem value='item-1'>
+                <AccordionTrigger className='cursor-pointer'>
+                  Jadwal Lapangan
+                </AccordionTrigger>
+                <AccordionContent className='grid gap-4 grid-cols-5 py-2'>
+                  {Array.from({ length: 20 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className='text-center rounded-md border p-2'>
+                      <p className='text-xs text-muted-foreground font-semibold'>
+                        60 Menit
+                      </p>
+                      <h3 className='text-sm font-semibold mb-1'>
+                        06:00 - 07:00
+                      </h3>
+                      <span>
+                        Rp. <span className='font-bold'>280.000</span>
+                      </span>
+                    </div>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
         </div>
       </section>
     </main>

@@ -1,9 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import useEmblaCarousel, {
-  type UseEmblaCarouselType,
-} from "embla-carousel-react";
+import React from "react";
 import { Icon } from "@iconify/react";
 import {
   Carousel,
@@ -12,54 +9,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "./ui/carousel";
-import { Car } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
 
 const VenueReview = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel();
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
-  type CarouselApi = UseEmblaCarouselType[1];
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const onSelect = useCallback((emblaApi: CarouselApi) => {
-    if (!emblaApi) return;
-    console.log("test", emblaApi.canScrollPrev(), emblaApi.canScrollNext());
-
-    // setCanScrollPrev(emblaApi.canScrollPrev());
-    // setCanScrollNext(emblaApi.canScrollNext());
-  }, []);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    emblaApi.on("select", onSelect);
-    emblaApi.on("init", onSelect);
-    emblaApi.on("reInit", onSelect); // Check initial state
-
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("init", onSelect);
-      emblaApi.off("reInit", onSelect);
-    };
-  }, [emblaApi, onSelect]);
-
   const Card = ({ image }: { image?: string | null }) => {
     return (
       <Dialog>
@@ -107,13 +65,19 @@ const VenueReview = () => {
           </DialogHeader>
           <div className='grid md:flex'>
             {image && (
-              <div className='w-full md:w-2/3'>
-                <img
-                  src='/image/venue-6.jpg'
-                  className='object-contain w-full'
-                  alt=''
-                />
-              </div>
+              <Carousel className='w-full md:w-2/3'>
+                <CarouselContent>
+                  <CarouselItem className='bg-black'>
+                    <img
+                      src='/image/venue-6.jpg'
+                      className='object-contain w-full'
+                      alt='Venue Image'
+                    />
+                  </CarouselItem>
+                </CarouselContent>
+                <CarouselNext className='right-0' />
+                <CarouselPrevious className='left-0' />
+              </Carousel>
             )}
             <div className='flex-1 md:ml-4 mt-4 md:mt-0'>
               <div className='mb-2 flex items-end justify-between'>

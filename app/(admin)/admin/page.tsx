@@ -54,57 +54,71 @@ export default async function AdminPage() {
   );
 
   return (
-    <div className='space-y-6'>
-      <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        {isSuperAdmin && (
+    <div className='flex flex-1 flex-col p-4 pt-0 font-sans'>
+      <div className='flex flex-wrap items-center justify-between gap-5 pb-6'>
+        <div className='flex flex-col justify-center gap-2'>
+          <h1 className='text-xl font-medium leading-none text-mono'>
+            Dashboard
+          </h1>
+          <div className='flex items-center gap-2 text-sm font-normal text-muted-foreground'>
+            Central Hub for Personal Customization
+          </div>
+        </div>
+      </div>
+      <div className='space-y-6'>
+        <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6'>
+          {isSuperAdmin && (
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardTitle className='text-sm font-medium'>
+                  Total Users
+                </CardTitle>
+                <Users className='h-4 w-4 text-muted-foreground' />
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>{userCount}</div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Total Users</CardTitle>
-              <Users className='h-4 w-4 text-muted-foreground' />
+              <CardTitle className='text-sm font-medium'>
+                {isSuperAdmin ? "Total Venues" : "My Venues"}
+              </CardTitle>
+              <Building2 className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>{userCount}</div>
+              <div className='text-2xl font-bold'>{venueCount}</div>
             </CardContent>
           </Card>
-        )}
 
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
-              {isSuperAdmin ? "Total Venues" : "My Venues"}
-            </CardTitle>
-            <Building2 className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{venueCount}</div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>
+                {isSuperAdmin ? "Total Bookings" : "Venue Bookings"}
+              </CardTitle>
+              <Calendar className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold'>{bookingCount}</div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
-              {isSuperAdmin ? "Total Bookings" : "Venue Bookings"}
-            </CardTitle>
-            <Calendar className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{bookingCount}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
-              {isSuperAdmin ? "Total Revenue" : "Venue Revenue"}
-            </CardTitle>
-            <DollarSign className='h-4 w-4 text-muted-foreground' />
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>
-              Rp {(totalRevenue._sum.totalPrice || 0).toLocaleString()}
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>
+                {isSuperAdmin ? "Total Revenue" : "Venue Revenue"}
+              </CardTitle>
+              <DollarSign className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold'>
+                Rp {(totalRevenue._sum.totalPrice || 0).toLocaleString()}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
