@@ -16,7 +16,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import { motion } from "motion/react";
 import CustButton from "@/components/custom-ui/cust-button";
 import {
   Popover,
@@ -81,13 +80,6 @@ export default async function Home() {
                     <ChevronRight className='h-4 w-4' />
                   </Link>
                 </Button>
-                {/* <Button
-                  asChild
-                  size='lg'
-                  variant='outline'
-                  className='bg-transparent border-white text-white hover:bg-white hover:text-primary'>
-                  <Link href='#how-it-works'>Learn More</Link>
-                </Button> */}
               </div>
             </div>
             <div className='hidden md:block'></div>
