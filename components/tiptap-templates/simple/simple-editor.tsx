@@ -136,11 +136,11 @@ const MainToolbarContent = ({
         <TextAlignButton align='justify' />
       </ToolbarGroup>
 
-      <ToolbarSeparator />
+      {/* <ToolbarSeparator /> */}
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <ImageUploadButton text='Add' />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
 
       {isMobile && <ToolbarSeparator />}
     </>
@@ -220,7 +220,7 @@ export function SimpleEditor({ className }: { className?: string }) {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+    content: "",
   });
 
   const rect = useCursorVisibility({
@@ -255,7 +255,7 @@ export function SimpleEditor({ className }: { className?: string }) {
         <EditorContent
           editor={editor}
           role='presentation'
-          className='simple-editor-content'
+          className='simple-editor-content mt-3'
         />
       </EditorContext.Provider>
     </div>

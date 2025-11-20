@@ -8,33 +8,35 @@ datasource db {
 }
 
 model User {
-  id          String         @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
-  email       String         @unique
+  email       String       @unique
   password    String
   phone       String?
-  role        Role           @default(USER)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  role        Role         @default(USER)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   bookings    Booking[]
   venueAdmins VenueAdmin[]
 }
 
 model Venue {
-  id          String         @id @default(cuid())
-  name        String
-  description String?
-  address     String
-  city        String
-  province    String?
-  location    String?
-  rules       String?
-  imageUrl    String?
-  facilities  String[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  courts      Court[]
-  admins      VenueAdmin[]
+  id              String          @id @default(cuid())
+  name            String
+  description     String?
+  address         String
+  cityId          String
+  provinceId      String
+  location        String?
+  rules           String?
+  imageUrl        String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  courts          Court[]
+  admins          VenueAdmin[]
+  venueFacilities venueFacility[]
+  province        province        @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+  city            city            @relation(fields: [cityId], references: [id], onDelete: Cascade)
 }
 
 model Court {
@@ -104,6 +106,53 @@ model CourtPricing {
 
   @@index([courtId])
   @@index([dayType])
+}
+
+model venueFacility {
+  id         String   @id @default(cuid())
+  venueId    String
+  facilityId String
+  createdAt  DateTime @default(now())
+  venue      Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  facility   facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+
+  @@unique([venueId, facilityId])
+  @@index([venueId])
+  @@index([facilityId])
+}
+
+model facility {
+  id        String   @id @default(cuid())
+  name      String
+  icon      String?  @default("material-symbols:add-row-above-rounded")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  venueFacilities venueFacility[]
+
+  @@unique([name])
+}
+
+model province {
+  id        String   @id
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cities city[]
+  venues Venue[]
+}
+
+model city {
+  id         String   @id
+  name       String
+  provinceId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  province   province @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+  venues     Venue[]
+
+  @@index([provinceId])
 }
 
 enum Role {

@@ -1,30 +1,8 @@
 import { auth } from "@/auth";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { getAccessibleVenues } from "@/lib/auth-helpers";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Icon } from "@iconify/react";
-import { FieldGroup, FieldLabel } from "@/components/ui/field";
-import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 export default async function AdminVenuesPage() {
   const session = await auth();

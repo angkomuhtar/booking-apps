@@ -46,10 +46,10 @@ async function main() {
     },
   });
 
-  console.log("✅ Created users:", { 
-    admin: admin.email, 
+  console.log("✅ Created users:", {
+    admin: admin.email,
     venueAdmin: venueAdmin.email,
-    user: user.email 
+    user: user.email,
   });
 
   const venue1 = await prisma.venue.create({
@@ -57,9 +57,9 @@ async function main() {
       name: "Sport Center Jakarta",
       description: "Premium sports venue in the heart of Jakarta",
       address: "Jl. Sudirman No. 123",
-      city: "Jakarta",
+      cityId: "3171",
+      provinceId: "31",
       imageUrl: "/images/venue1.jpg",
-      facilities: ["Parking", "Shower", "Locker", "Cafe"],
     },
   });
 
@@ -68,9 +68,9 @@ async function main() {
       name: "Bandung Sports Hall",
       description: "Modern sports facility with top-notch equipment",
       address: "Jl. Dago No. 456",
-      city: "Bandung",
+      cityId: "3273",
+      provinceId: "32",
       imageUrl: "/images/venue2.jpg",
-      facilities: ["Parking", "Shower", "WiFi", "Canteen"],
     },
   });
 

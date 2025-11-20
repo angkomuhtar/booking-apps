@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Venue" ALTER COLUMN "cityId" DROP DEFAULT,
+ALTER COLUMN "provinceId" DROP DEFAULT;
