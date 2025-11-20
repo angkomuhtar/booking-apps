@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
-import App from "next/app";
-import AppFooter from "@/components/app-footer";
-import AppNav from "@/components/app-navigation";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -32,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${geistMono.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
+        <Toaster position='top-right' />
       </body>
     </html>
   );

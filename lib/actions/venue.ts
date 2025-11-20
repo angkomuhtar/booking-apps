@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireVenueAdmin } from "@/lib/auth-helpers";
 import {
@@ -14,7 +13,7 @@ import {
 export async function createVenue(data: CreateVenueInput) {
   try {
     const session = await requireVenueAdmin();
-    
+
     const validatedData = createVenueSchema.parse(data);
 
     const venue = await prisma.venue.create({
@@ -73,7 +72,7 @@ export async function createVenue(data: CreateVenueInput) {
 export async function updateVenue(venueId: string, data: UpdateVenueInput) {
   try {
     const session = await requireAuth();
-    
+
     if (session.user.role === "SUPER_ADMIN") {
     } else if (session.user.role === "VENUE_ADMIN") {
       const venueAdmin = await prisma.venueAdmin.findUnique({

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, Watch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,18 +22,29 @@ import "@/components/tiptap-node/image-node/image-node.scss";
 import "@/components/tiptap-node/heading-node/heading-node.scss";
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
 import "@/components/tiptap-templates/simple/simple-editor.scss";
-
-type Facility = {
-  id: string;
-  name: string;
-  icon: string | null;
-};
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  City,
+  Facility,
+  getCity,
+  getProvince,
+  Province,
+} from "@/lib/actions/select";
+import { toast } from "sonner";
 
 export default function AddVenuePage() {
   const router = useRouter();
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
 
   const {
     register,
@@ -54,6 +65,20 @@ export default function AddVenuePage() {
       facilities: [],
     },
   });
+
+  const selectedProvince = watch("province");
+
+  const loadProvince = async ({ name = "" }) => {
+    console.log("load province", name);
+    const data = await getProvince({ name });
+    setProvinces(data);
+  };
+
+  const loadCity = async ({ province = "" }) => {
+    console.log("load city", province);
+    const data = await getCity({ province });
+    setCities(data);
+  };
 
   useEffect(() => {
     async function loadFacilities() {
@@ -84,11 +109,12 @@ export default function AddVenuePage() {
     try {
       const result = await createVenue(data);
 
+      console.log("Create venue result:", result);
       if (result.success) {
         router.push("/admin/venues");
         router.refresh();
       } else {
-        setError(result.message);
+        toast.error("Terjadi Kesdalahan saat membuat venue");
       }
     } catch (err) {
       setError("Terjadi kesalahan saat membuat venue");
@@ -167,11 +193,54 @@ export default function AddVenuePage() {
               <label htmlFor='province' className='form-label'>
                 Provinsi
               </label>
-              <input
-                id='province'
-                type='text'
-                className='form-control'
-                {...register("province")}
+              <Controller
+                name='province'
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onOpenChange={(open) => {
+                      if (open) {
+                        loadProvince({ name: "1" }); // Load initial provinces
+                      }
+                    }}>
+                    <SelectTrigger className='w-full form-control'>
+                      <SelectValue placeholder='Pilih Provinsi' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className='px-2 py-1.5 mb-1 sticky top-0 z-10 bg-white'>
+                        <input
+                          type='text'
+                          placeholder='Cari provinsi...'
+                          className='form-control text-sm h-8'
+                          onChange={(e) => {
+                            e.stopPropagation(); // Prevent select from closing
+                            loadProvince({ name: e.target.value });
+                          }}
+                          onKeyDown={(e) => {
+                            e.stopPropagation(); // Prevent select keyboard
+                            // navigation;
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent select from closing
+                          }}
+                        />
+                      </div>
+                      {provinces.length === 0 ? (
+                        <div className='px-2 py-6 text-center text-sm text-muted-foreground'>
+                          Tidak ada provinsi ditemukan
+                        </div>
+                      ) : (
+                        provinces.map((province) => (
+                          <SelectItem key={province.id} value={province.id}>
+                            {province.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
               />
               {errors.province && (
                 <p className='form-error'>{errors.province.message}</p>
@@ -182,11 +251,36 @@ export default function AddVenuePage() {
               <label htmlFor='city' className='form-label'>
                 Kota / Kabupaten <span className='text-red-500'>*</span>
               </label>
-              <input
-                id='city'
-                type='text'
-                className='form-control'
-                {...register("city")}
+              <Controller
+                name='city'
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onOpenChange={(open) => {
+                      if (open) {
+                        loadCity({ province: selectedProvince }); // Load initial provinces
+                      }
+                    }}>
+                    <SelectTrigger className='w-full form-control'>
+                      <SelectValue placeholder='Pilih Kota' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cities.length === 0 ? (
+                        <div className='px-2 py-6 text-center text-sm text-muted-foreground'>
+                          Tidak ada Kota ditemukan
+                        </div>
+                      ) : (
+                        cities.map((city) => (
+                          <SelectItem key={city.id} value={city.id}>
+                            {city.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
               />
               {errors.city && (
                 <p className='form-error'>{errors.city.message}</p>
@@ -218,7 +312,7 @@ export default function AddVenuePage() {
               <label htmlFor='facilities' className='form-label'>
                 Fasilitas Venue <span className='text-red-500'>*</span>
               </label>
-              <div className='grid grid-cols-2 gap-3'>
+              <div className='grid grid-cols-3 gap-3'>
                 {facilities.map((facility) => (
                   <div key={facility.id} className='flex items-center gap-3'>
                     <Checkbox

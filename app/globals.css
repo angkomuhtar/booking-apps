@@ -257,7 +257,7 @@ body {
     @apply flex 
     w-full bg-background border border-input shadow-xs shadow-black/5 transition-[color,box-shadow] 
     text-foreground placeholder:text-muted-foreground/80 
-    focus-visible:border-ring focus-visible:ring-ring/10 focus-visible:ring-[1px] disabled:cursor-not-allowed disabled:opacity-60 [&[readonly]]:bg-muted/80 [&[readonly]]:cursor-not-allowed file:h-full [&[type=file]]:py-0 file:border-solid file:border-input file:bg-transparent file:font-medium file:not-italic file:text-foreground file:p-0 file:border-0 file:border-e aria-invalid:border-destructive/60 aria-invalid:ring-destructive/10 dark:aria-invalid:border-destructive dark:aria-invalid:ring-destructive/20 h-8.5 px-3 text-[0.8125rem] leading-(--text-sm--line-height) rounded-md file:pe-3 file:me-3;
+    focus-visible:border-ring! focus-visible:ring-ring/10! focus-visible:ring-[1px]! disabled:cursor-not-allowed disabled:opacity-60 [&[readonly]]:bg-muted/80 [&[readonly]]:cursor-not-allowed file:h-full [&[type=file]]:py-0 file:border-solid file:border-input file:bg-transparent file:font-medium file:not-italic file:text-foreground file:p-0 file:border-0 file:border-e aria-invalid:border-destructive/60 aria-invalid:ring-destructive/10 dark:aria-invalid:border-destructive dark:aria-invalid:ring-destructive/20 h-8.5 px-3 text-[0.8125rem] leading-(--text-sm--line-height) rounded-md file:pe-3 file:me-3;
   }
   .form-error {
     @apply -mt-0.5 text-xs font-normal text-destructive;
