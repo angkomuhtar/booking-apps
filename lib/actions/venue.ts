@@ -21,8 +21,8 @@ export async function createVenue(data: CreateVenueInput) {
         name: validatedData.name,
         description: validatedData.description,
         address: validatedData.address,
-        city: validatedData.city,
-        province: validatedData.province,
+        cityId: validatedData.city,
+        provinceId: validatedData.province || "",
         rules: validatedData.rules,
       },
     });
@@ -105,8 +105,8 @@ export async function updateVenue(venueId: string, data: UpdateVenueInput) {
         name: validatedData.name,
         description: validatedData.description,
         address: validatedData.address,
-        city: validatedData.city,
-        province: validatedData.province,
+        cityId: validatedData.city,
+        provinceId: validatedData.province,
         rules: validatedData.rules,
       },
     });
@@ -215,5 +215,29 @@ export async function getFacilities() {
   } catch (error) {
     console.error("Get facilities error:", error);
     return [];
+  }
+}
+
+export async function getVenues() {
+  try {
+    await requireAuth();
+    
+    const venues = await prisma.venue.findMany({
+      include: {
+        city: true,
+        province: true,
+        venueFacilities: {
+          include: { 
+            facility: true 
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    return { success: true, data: venues };
+  } catch (error) {
+    console.error("Get venues error:", error);
+    return { success: false, data: [], message: "Gagal mengambil data venues" };
   }
 }

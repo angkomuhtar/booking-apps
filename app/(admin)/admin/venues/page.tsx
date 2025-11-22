@@ -1,8 +1,10 @@
 import { auth } from "@/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getAccessibleVenues } from "@/lib/auth-helpers";
 import { Icon } from "@iconify/react";
+import { getVenues } from "@/lib/actions/venue";
+import { DataTable } from "@/components/data-table";
+import { columns } from "./columns";
 
 export default async function AdminVenuesPage() {
   const session = await auth();
@@ -18,9 +20,7 @@ export default async function AdminVenuesPage() {
     redirect("/");
   }
 
-  const venues = await getAccessibleVenues();
-
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+  const result = await getVenues();
 
   return (
     <div className='flex flex-1 flex-col p-4 pt-0 font-sans'>
@@ -40,7 +40,19 @@ export default async function AdminVenuesPage() {
           </Link>
         </div>
       </div>
-      <div className='bg-sidebar-accent min-h-72 rounded-md'></div>
+
+      {result.success ? (
+        <DataTable 
+          columns={columns} 
+          data={result.data} 
+          searchKey="name"
+          searchPlaceholder="Cari venue..."
+        />
+      ) : (
+        <div className='bg-sidebar-accent min-h-72 rounded-md flex items-center justify-center'>
+          <p className='text-muted-foreground'>{result.message}</p>
+        </div>
+      )}
     </div>
   );
 }
