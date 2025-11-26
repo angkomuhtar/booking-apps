@@ -98,7 +98,9 @@ export const columns: ColumnDef<VenueColumn>[] = [
       return (
         <div className='flex gap-2 items-center'>
           <button className='p-1 cursor-pointer'>
-            <Icon icon='heroicons-solid:chevron-right' className='size-4' />
+            <Link href={`/admin/venues/${venue.id}`}>
+              <Icon icon='heroicons-solid:chevron-right' className='size-4' />
+            </Link>
           </button>
         </div>
       );

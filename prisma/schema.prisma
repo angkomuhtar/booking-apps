@@ -28,7 +28,7 @@ model Venue {
   cityId          String
   provinceId      String
   location        String?
-  rules           String?
+  venueImages     VenueImage[]
   imageUrl        String?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -153,6 +153,20 @@ model city {
   venues     Venue[]
 
   @@index([provinceId])
+}
+
+model VenueImage {
+  id        String   @id @default(cuid())
+  venueId   String
+  imageUrl  String
+  order     Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@index([venueId])
+  @@index([isPrimary])
 }
 
 enum Role {

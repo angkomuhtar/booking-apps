@@ -8,6 +8,16 @@ export const createVenueSchema = z.object({
   province: z.string().min(2, "Provinsi minimal 2 karakter").optional(),
   rules: z.string().optional(),
   facilities: z.array(z.string()).min(1, "Pilih minimal 1 fasilitas"),
+  images: z
+    .array(
+      z.object({
+        url: z.string().url("URL gambar tidak valid"),
+        order: z.number().default(0),
+        isPrimary: z.boolean().default(false),
+      })
+    )
+    .min(2, "Upload minimal 2 gambar")
+    .max(10, "Maksimal 10 gambar"),
 });
 
 export const updateVenueSchema = z.object({

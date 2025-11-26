@@ -27,21 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User2 } from "lucide-react";
-import { Icon } from "@iconify/react";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-
+import AppBreadcrumb from "@/components/app-breadcrumb";
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
 
@@ -55,8 +41,6 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
   ) {
     redirect("/");
   }
-
-  console.log("user data", session.user);
 
   return (
     <SidebarProvider>
@@ -75,17 +59,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
               orientation='vertical'
               className='mr-2 data-[orientation=vertical]:h-4'
             />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className='hidden md:block'>
-                  <BreadcrumbLink href='/admin'>Admin Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className='hidden md:block' />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Management</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <AppBreadcrumb />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

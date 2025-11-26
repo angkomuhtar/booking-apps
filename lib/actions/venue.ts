@@ -3,14 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireVenueAdmin } from "@/lib/auth-helpers";
-import {
-  createVenueSchema,
-  updateVenueSchema,
-  type CreateVenueInput,
-  type UpdateVenueInput,
-} from "@/schema/venues.schema";
+import { createVenueSchema, updateVenueSchema } from "@/schema/venues.schema";
+import { Venue } from "@/types";
+import z from "zod";
 
-export async function createVenue(data: CreateVenueInput) {
+export async function createVenue(data: Venue) {
   try {
     const session = await requireVenueAdmin();
 
@@ -24,6 +21,15 @@ export async function createVenue(data: CreateVenueInput) {
         cityId: validatedData.city,
         provinceId: validatedData.province || "",
         rules: validatedData.rules,
+        venueImages: {
+          createMany: {
+            data: validatedData.images.map((img, index) => ({
+              imageUrl: img.url,
+              order: img.order || index,
+              isPrimary: img.isPrimary || index === 0,
+            })),
+          },
+        },
       },
     });
 
@@ -69,7 +75,10 @@ export async function createVenue(data: CreateVenueInput) {
   }
 }
 
-export async function updateVenue(venueId: string, data: UpdateVenueInput) {
+export async function updateVenue(
+  venueId: string,
+  data: z.infer<typeof updateVenueSchema>
+) {
   try {
     const session = await requireAuth();
 
@@ -108,9 +117,17 @@ export async function updateVenue(venueId: string, data: UpdateVenueInput) {
         cityId: validatedData.city,
         provinceId: validatedData.province,
         rules: validatedData.rules,
+        venueImages: {
+          createMany: {
+            data: validatedData.images.map((img, index) => ({
+              imageUrl: img.url,
+              order: img.order || index,
+              isPrimary: img.isPrimary || index === 0,
+            })),
+          },
+        },
       },
     });
-
     if (validatedData.facilities) {
       await prisma.venueFacility.deleteMany({
         where: { venueId },
@@ -221,20 +238,20 @@ export async function getFacilities() {
 export async function getVenues() {
   try {
     await requireAuth();
-    
+
     const venues = await prisma.venue.findMany({
       include: {
         city: true,
         province: true,
         venueFacilities: {
-          include: { 
-            facility: true 
-          }
-        }
+          include: {
+            facility: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
-    
+
     return { success: true, data: venues };
   } catch (error) {
     console.error("Get venues error:", error);

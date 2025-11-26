@@ -106,6 +106,7 @@ export default function AddVenuePage() {
     setIsLoading(true);
     setError(null);
 
+    // return false;
     try {
       const result = await createVenue(data);
 
@@ -114,7 +115,7 @@ export default function AddVenuePage() {
         router.push("/admin/venues");
         router.refresh();
       } else {
-        toast.error("Terjadi Kesdalahan saat membuat venue");
+        toast.error("Terjadi Kesalahan saat membuat venue");
       }
     } catch (err) {
       setError("Terjadi kesalahan saat membuat venue");
@@ -299,7 +300,8 @@ export default function AddVenuePage() {
                 render={({ field }) => (
                   <SimpleEditor
                     className='border border-input rounded-md h-72! max-h-72 shadow-sm'
-                    {...field}
+                    value={field.value}
+                    onChange={field.onChange}
                   />
                 )}
               />
