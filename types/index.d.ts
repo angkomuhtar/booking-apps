@@ -1,4 +1,4 @@
-export type VenueImages {
+export type VenueImages = {
     id: string;
     venueId: string;
     imageUrl: string;
@@ -6,7 +6,7 @@ export type VenueImages {
     isPrimary: boolean;
 }
 
-export type Venue {
+export type Venue = {
     id: string;
     name: string;
     description: string | null;

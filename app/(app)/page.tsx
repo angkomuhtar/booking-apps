@@ -29,6 +29,7 @@ export default async function Home() {
   const venues = await prisma.venue.findMany({
     include: {
       courts: true,
+      city: true,
     },
     take: 6,
   });
@@ -297,7 +298,7 @@ export default async function Home() {
                   <div className='space-y-3 mb-4'>
                     <div className='flex items-center gap-2 text-sm text-muted-foreground'>
                       <MapPin className='h-4 w-4 text-primary' />
-                      <span>{venue.city}</span>
+                      <span>{venue.city.name}</span>
                     </div>
                     <div className='flex items-center gap-2 text-sm text-muted-foreground'>
                       <CalendarDays className='h-4 w-4 text-primary' />

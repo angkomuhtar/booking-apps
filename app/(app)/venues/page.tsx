@@ -8,6 +8,7 @@ export default async function VenuesPage() {
   const venues = await prisma.venue.findMany({
     include: {
       courts: true,
+      city: true,
     },
   });
 
@@ -41,7 +42,7 @@ export default async function VenuesPage() {
                     <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
                     <div>
                       <p>{venue.address}</p>
-                      <p className="text-muted-foreground">{venue.city}</p>
+                      <p className="text-muted-foreground">{venue.city.name}</p>
                     </div>
                   </div>
                   <p className="text-muted-foreground">

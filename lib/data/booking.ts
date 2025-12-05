@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireVenueAccess } from "@/lib/auth-helpers";
-import { BookingStatus } from "@prisma/client";
+import { BookingStatus, Prisma } from "@prisma/client";
 
 export async function getBookings() {
   return await prisma.booking.findMany({
@@ -171,7 +171,7 @@ export async function getCourtBookings(
 
   await requireVenueAccess(court.venueId);
 
-  const whereClause: any = { courtId };
+  const whereClause: Prisma.BookingWhereInput = { courtId };
 
   if (startDate || endDate) {
     whereClause.date = {};
@@ -290,7 +290,7 @@ export async function getUpcomingBookings(userId: string) {
 }
 
 export async function getBookingStats(venueId?: string) {
-  const whereClause: any = {};
+  const whereClause: Prisma.BookingWhereInput = {};
 
   if (venueId) {
     await requireVenueAccess(venueId);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller, Watch } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,6 +37,8 @@ import {
   Province,
 } from "@/lib/actions/select";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Icon } from "@iconify/react";
 
 export default function AddVenuePage() {
   const router = useRouter();
@@ -63,19 +65,18 @@ export default function AddVenuePage() {
       province: "",
       rules: "",
       facilities: [],
+      images: [],
     },
   });
 
   const selectedProvince = watch("province");
 
   const loadProvince = async ({ name = "" }) => {
-    console.log("load province", name);
     const data = await getProvince({ name });
     setProvinces(data);
   };
 
   const loadCity = async ({ province = "" }) => {
-    console.log("load city", province);
     const data = await getCity({ province });
     setCities(data);
   };
@@ -89,6 +90,41 @@ export default function AddVenuePage() {
   }, []);
 
   const selectedFacilities = watch("facilities");
+  const selectedImages = watch("images");
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const currentImages = selectedImages || [];
+    if (currentImages.length >= 10) {
+      toast.error("Maksimal 10 gambar yang diizinkan");
+      return false;
+    }
+    const newImages = Array.from(files).map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      name: file.name,
+    }));
+    var check = currentImages.find((img) =>
+      newImages.some((newImg) => newImg.name === img.name)
+    );
+
+    if (check) return false;
+    setValue("images", [...currentImages, ...newImages]);
+    e.target.value = "";
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const currentImages = selectedImages || [];
+    const imageToRemove = currentImages[index];
+    if (imageToRemove?.preview) {
+      URL.revokeObjectURL(imageToRemove.preview);
+    }
+    setValue(
+      "images",
+      currentImages.filter((_, i) => i !== index)
+    );
+  };
 
   const handleFacilityChange = (facilityId: string, checked: boolean) => {
     const current = selectedFacilities || [];
@@ -109,7 +145,6 @@ export default function AddVenuePage() {
     // return false;
     try {
       const result = await createVenue(data);
-
       console.log("Create venue result:", result);
       if (result.success) {
         router.push("/admin/venues");
@@ -145,7 +180,7 @@ export default function AddVenuePage() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-2 gap-6 items-start'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 items-start'>
           <div className='grid items-start gap-4'>
             <div className='flex flex-col gap-2.5'>
               <label htmlFor='name' className='form-label'>
@@ -334,8 +369,76 @@ export default function AddVenuePage() {
                 <p className='form-error'>{errors.facilities.message}</p>
               )}
             </div>
+
+            <div className='flex flex-col gap-2.5'>
+              <label htmlFor='facilities' className='form-label'>
+                Gambar <span className='text-red-500'>*</span>
+              </label>
+              <div className='p-4 border border-dashed border-gray-300 rounded-lg flex flex-col justify-center items-center'>
+                <p className='text-sm text-muted-foreground font-bold'>
+                  Upload gambar venue disini
+                </p>
+                <p className='text-xs font-light text-muted-foreground'>
+                  2 - 10 PNG JPG, maksimal 5MB
+                </p>
+                <Input
+                  type='file'
+                  id='image'
+                  className='hidden'
+                  accept='image/png,image/jpeg,image/jpg'
+                  multiple
+                  onChange={handleImageChange}
+                />
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='mt-4'
+                  onClick={() => document.getElementById("image")?.click()}>
+                  <Icon
+                    icon='icon-park-outline:upload-one'
+                    className='w-4 h-4'
+                  />
+                  Pilih Gambar
+                </Button>
+              </div>
+              <p className='text-xs font-semibold text-muted-foreground mt-1'>
+                {selectedImages?.length || 0} gambar dipilih
+              </p>
+              {selectedImages && selectedImages.length > 0 && (
+                <div className='flex flex-col gap-2 mt-2'>
+                  {selectedImages.map((image, index) => (
+                    <div
+                      key={index}
+                      className='flex items-center gap-3 p-1 border rounded-md'>
+                      <div className='rounded-md aspect-video h-14 border border-gray-300'>
+                        <img
+                          src={image.preview}
+                          alt={image.name}
+                          className='object-contain w-full h-full rounded-md'
+                        />
+                      </div>
+                      <span className='flex-1 text-sm line-clamp-1'>
+                        {image.name}
+                      </span>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='sm'
+                        className='text-red-500 hover:text-red-700 hover:bg-red-50'
+                        onClick={() => handleRemoveImage(index)}>
+                        <Icon icon='mdi:trash-outline' className='w-4 h-4' />
+                        Hapus
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {errors.images && (
+                <p className='form-error'>{errors.images.message}</p>
+              )}
+            </div>
           </div>
-          <div className='flex gap-3 pt-4 col-span-2 justify-end'>
+          <div className='flex gap-3 pt-4 lg:col-span-2 justify-end'>
             <Button
               type='button'
               variant='outline'

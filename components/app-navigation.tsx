@@ -2,9 +2,7 @@ import {
   BadgeDollarSign,
   Menu,
   ShoppingCart,
-  Trash2,
   User2,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -20,9 +18,7 @@ import {
 } from "./ui/dropdown-menu";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,

@@ -1,6 +1,5 @@
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -8,29 +7,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
-  AirVent,
-  Armchair,
-  Car,
-  Coffee,
   Dot,
-  Heart,
   Home,
-  Lightbulb,
-  Lock,
   MapPin,
-  MonitorPlay,
-  Moon,
-  Shirt,
-  ShoppingBag,
-  ShowerHead,
-  Soup,
   Star,
-  Users,
-  UtensilsCrossed,
-  Video,
-  Volume2,
-  Warehouse,
-  Wifi,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -54,7 +34,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -63,17 +42,6 @@ import {
 } from "@/components/ui/accordion";
 
 const page = () => {
-  const images = [
-    "image/venue-1.jpg",
-    "/image/venue-2.jpeg",
-    "/image/venue-3.jpeg",
-    "/image/venue-4.jpg",
-    "/image/venue-5.jpg",
-    "/image/venue-6.jpg",
-    "/image/venue-7.jpg",
-    "/image/venue-8.jpg",
-  ];
-
   const facilities = [
     { value: "parking", label: "Parkir", icon: "mdi:car" },
     { value: "shower", label: "Shower", icon: "mingcute:shower-line" },

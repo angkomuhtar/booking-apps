@@ -3,15 +3,40 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireVenueAdmin } from "@/lib/auth-helpers";
-import { createVenueSchema, updateVenueSchema } from "@/schema/venues.schema";
-import { Venue } from "@/types";
+import {
+  createVenueSchema,
+  updateVenueSchema,
+  CreateVenueInput,
+} from "@/schema/venues.schema";
+import { Prisma } from "@prisma/client";
 import z from "zod";
+import { uploadToR2 } from "../r2";
 
-export async function createVenue(data: Venue) {
+export async function createVenue(data: CreateVenueInput) {
   try {
-    const session = await requireVenueAdmin();
+    // const session = await requireVenueAdmin();
 
     const validatedData = createVenueSchema.parse(data);
+    console.log(data);
+
+    const uploadedUrls = await Promise.all(
+      data.images.map(async (img, index) => {
+        const buffer = Buffer.from(await img.file.arrayBuffer());
+        const url = await uploadToR2(
+          buffer,
+          img.file.name,
+          img.file.type,
+          "venues"
+        );
+        return {
+          url: url,
+          order: index,
+          isPrimary: img.isPrimary || index === 0,
+        };
+      })
+    );
+
+    // console.log(uploadedUrls);
 
     const venue = await prisma.venue.create({
       data: {
@@ -20,13 +45,12 @@ export async function createVenue(data: Venue) {
         address: validatedData.address,
         cityId: validatedData.city,
         provinceId: validatedData.province || "",
-        rules: validatedData.rules,
         venueImages: {
           createMany: {
-            data: validatedData.images.map((img, index) => ({
+            data: uploadedUrls.map((img, index) => ({
               imageUrl: img.url,
-              order: img.order || index,
-              isPrimary: img.isPrimary || index === 0,
+              order: img.order,
+              isPrimary: img.isPrimary,
             })),
           },
         },
@@ -42,14 +66,14 @@ export async function createVenue(data: Venue) {
       });
     }
 
-    if (session.user.role === "VENUE_ADMIN") {
-      await prisma.venueAdmin.create({
-        data: {
-          userId: session.user.id,
-          venueId: venue.id,
-        },
-      });
-    }
+    // if (session.user.role === "VENUE_ADMIN") {
+    //   await prisma.venueAdmin.create({
+    //     data: {
+    //       userId: session.user.id,
+    //       venueId: venue.id,
+    //     },
+    //   });
+    // }
 
     revalidatePath("/admin/venues");
 
@@ -108,25 +132,33 @@ export async function updateVenue(
 
     const validatedData = updateVenueSchema.parse(data);
 
+    const updateData: Prisma.VenueUpdateInput = {
+      name: validatedData.name,
+      description: validatedData.description,
+      address: validatedData.address,
+      city: validatedData.city
+        ? { connect: { id: validatedData.city } }
+        : undefined,
+      province: validatedData.province
+        ? { connect: { id: validatedData.province } }
+        : undefined,
+    };
+
+    if (validatedData.images && validatedData.images.length > 0) {
+      updateData.venueImages = {
+        createMany: {
+          data: validatedData.images.map((img, index) => ({
+            imageUrl: img.url,
+            order: img.order || index,
+            isPrimary: img.isPrimary || index === 0,
+          })),
+        },
+      };
+    }
+
     await prisma.venue.update({
       where: { id: venueId },
-      data: {
-        name: validatedData.name,
-        description: validatedData.description,
-        address: validatedData.address,
-        cityId: validatedData.city,
-        provinceId: validatedData.province,
-        rules: validatedData.rules,
-        venueImages: {
-          createMany: {
-            data: validatedData.images.map((img, index) => ({
-              imageUrl: img.url,
-              order: img.order || index,
-              isPrimary: img.isPrimary || index === 0,
-            })),
-          },
-        },
-      },
+      data: updateData,
     });
     if (validatedData.facilities) {
       await prisma.venueFacility.deleteMany({

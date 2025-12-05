@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -54,7 +53,7 @@ async function main() {
   });
   console.log("✅ Seeded facilities:", data);
 
-  const provinces = await prisma.province.createMany({
+  await prisma.province.createMany({
     data: [
       {
         id: "11",

@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireAuth, requireVenueAccess } from "@/lib/auth-helpers";
-import { Prisma } from "@prisma/client";
+import { requireVenueAccess } from "@/lib/auth-helpers";
 
 export async function getVenues() {
   return await prisma.venue.findMany({
@@ -37,7 +36,6 @@ export async function getVenueById(id: string) {
       city: true,
       province: true,
       location: true,
-      rules: true,
       imageUrl: true,
       createdAt: true,
       courts: {
@@ -102,7 +100,7 @@ export async function searchVenues(query: string) {
     where: {
       OR: [
         { name: { contains: query, mode: "insensitive" } },
-        { city: { contains: query, mode: "insensitive" } },
+        { city: { name: { contains: query, mode: "insensitive" } } },
         { address: { contains: query, mode: "insensitive" } },
       ],
       courts: {
@@ -157,8 +155,10 @@ export async function getVenuesByCity(city: string) {
   return await prisma.venue.findMany({
     where: {
       city: {
-        contains: city,
-        mode: "insensitive",
+        name: {
+          contains: city,
+          mode: "insensitive",
+        },
       },
       courts: {
         some: { isActive: true },
