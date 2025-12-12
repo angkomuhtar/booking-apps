@@ -1,17 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
-  CalendarDays,
-  MapPin,
-  Trophy,
-  Clock,
   ChevronRight,
-  Phone,
-  Mail,
-  Star,
   Calendar as CalendarIcon,
   ArrowRight,
 } from "lucide-react";
@@ -190,16 +182,16 @@ export default async function Home() {
             </button>
           </div>
           <div className='grid lg:grid-cols-5 gap-4 mt-6 py-2'>
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
+            {venues.length === 0 ? (
+              <div>No venues found.</div>
+            ) : (
+              venues.map((venue) => <ProductCard key={venue.id} />)
+            )}
           </div>
         </section>
       </main>
 
-      <main className='container mx-auto px-4 py-12'>
+      {/* <main className='container mx-auto px-4 py-12'>
         <section className='mb-16' id='how-it-works'>
           <h3 className='text-3xl font-bold text-center mb-3'>
             Why Choose Ayo Booking?
@@ -369,7 +361,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-      </main>
+      </main> */}
     </>
   );
 }

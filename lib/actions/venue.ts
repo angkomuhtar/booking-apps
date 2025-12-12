@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, requireVenueAdmin } from "@/lib/auth-helpers";
+import { requireAuth } from "@/lib/auth-helpers";
 import {
   createVenueSchema,
   updateVenueSchema,
@@ -14,10 +14,9 @@ import { uploadToR2 } from "../r2";
 
 export async function createVenue(data: CreateVenueInput) {
   try {
-    // const session = await requireVenueAdmin();
+    const session = await requireAuth();
 
     const validatedData = createVenueSchema.parse(data);
-    console.log(data);
 
     const uploadedUrls = await Promise.all(
       data.images.map(async (img, index) => {
@@ -36,8 +35,6 @@ export async function createVenue(data: CreateVenueInput) {
       })
     );
 
-    // console.log(uploadedUrls);
-
     const venue = await prisma.venue.create({
       data: {
         name: validatedData.name,
@@ -47,7 +44,7 @@ export async function createVenue(data: CreateVenueInput) {
         provinceId: validatedData.province || "",
         venueImages: {
           createMany: {
-            data: uploadedUrls.map((img, index) => ({
+            data: uploadedUrls.map((img) => ({
               imageUrl: img.url,
               order: img.order,
               isPrimary: img.isPrimary,
@@ -66,14 +63,14 @@ export async function createVenue(data: CreateVenueInput) {
       });
     }
 
-    // if (session.user.role === "VENUE_ADMIN") {
-    //   await prisma.venueAdmin.create({
-    //     data: {
-    //       userId: session.user.id,
-    //       venueId: venue.id,
-    //     },
-    //   });
-    // }
+    if (!session.user.accessAllVenues) {
+      await prisma.venueAccess.create({
+        data: {
+          userId: session.user.id,
+          venueId: venue.id,
+        },
+      });
+    }
 
     revalidatePath("/admin/venues");
 
@@ -106,9 +103,9 @@ export async function updateVenue(
   try {
     const session = await requireAuth();
 
-    if (session.user.role === "SUPER_ADMIN") {
-    } else if (session.user.role === "VENUE_ADMIN") {
-      const venueAdmin = await prisma.venueAdmin.findUnique({
+    if (session.user.role === "Super Admin" || session.user.accessAllVenues) {
+    } else {
+      const venueAccess = await prisma.venueAccess.findUnique({
         where: {
           userId_venueId: {
             userId: session.user.id,
@@ -117,17 +114,12 @@ export async function updateVenue(
         },
       });
 
-      if (!venueAdmin) {
+      if (!venueAccess) {
         return {
           success: false,
           message: "Anda tidak memiliki akses ke venue ini",
         };
       }
-    } else {
-      return {
-        success: false,
-        message: "Unauthorized",
-      };
     }
 
     const validatedData = updateVenueSchema.parse(data);
@@ -203,9 +195,9 @@ export async function deleteVenue(venueId: string) {
   try {
     const session = await requireAuth();
 
-    if (session.user.role === "SUPER_ADMIN") {
-    } else if (session.user.role === "VENUE_ADMIN") {
-      const venueAdmin = await prisma.venueAdmin.findUnique({
+    if (session.user.role === "Super Admin" || session.user.accessAllVenues) {
+    } else {
+      const venueAccess = await prisma.venueAccess.findUnique({
         where: {
           userId_venueId: {
             userId: session.user.id,
@@ -214,17 +206,12 @@ export async function deleteVenue(venueId: string) {
         },
       });
 
-      if (!venueAdmin) {
+      if (!venueAccess) {
         return {
           success: false,
           message: "Anda tidak memiliki akses ke venue ini",
         };
       }
-    } else {
-      return {
-        success: false,
-        message: "Unauthorized",
-      };
     }
 
     await prisma.venue.delete({

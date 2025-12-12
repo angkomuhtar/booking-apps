@@ -8,6 +8,7 @@ import {
   Users,
   Settings,
   GalleryVerticalEnd,
+  Computer,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -41,6 +42,12 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
       },
       {
+        title: "Cashier",
+        url: "/cashier",
+        icon: Computer,
+        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+      },
+      {
         title: "Venues",
         url: "/admin/venues",
         icon: Building2,
@@ -60,9 +67,16 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       },
       {
         title: "Settings",
-        url: "/admin/settings",
         icon: Settings,
         roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+        child: [
+          {
+            title: "Roles",
+            url: "/admin/settings/roles",
+          },
+          { title: "Permissions", url: "/admin/settings/permissions" },
+          { title: "User Roles", url: "/admin/settings/user-roles" },
+        ],
       },
     ];
 

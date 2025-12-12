@@ -10,14 +10,12 @@ import {
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const AppBreadcrumb = () => {
   const paths = usePathname()
     .split("/")
     .filter((path) => path);
-
-  console.log(paths);
-
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -32,9 +30,15 @@ const AppBreadcrumb = () => {
             <React.Fragment key={href}>
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage>{displayName}</BreadcrumbPage>
+                  <BreadcrumbPage>
+                    {displayName == "Admin" ? "Dashboard" : displayName}
+                  </BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={href}>{displayName}</BreadcrumbLink>
+                  <BreadcrumbLink asChild>
+                    <Link href={href}>
+                      {displayName == "Admin" ? "Dashboard" : displayName}
+                    </Link>
+                  </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
               {!isLast && <BreadcrumbSeparator />}

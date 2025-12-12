@@ -15,7 +15,10 @@ export async function getVenues() {
       address: true,
       city: true,
       province: true,
-      imageUrl: true,
+      venueImages: {
+        where: { isPrimary: true },
+        take: 1,
+      },
       createdAt: true,
       _count: {
         select: { courts: true },
@@ -36,7 +39,7 @@ export async function getVenueById(id: string) {
       city: true,
       province: true,
       location: true,
-      imageUrl: true,
+      venueImages: true,
       createdAt: true,
       courts: {
         where: { isActive: true },
@@ -80,7 +83,10 @@ export async function getVenuesWithCourts() {
       address: true,
       city: true,
       province: true,
-      imageUrl: true,
+      venueImages: {
+        where: { isPrimary: true },
+        take: 1,
+      },
       courts: {
         where: { isActive: true },
         select: {
@@ -113,7 +119,10 @@ export async function searchVenues(query: string) {
       description: true,
       address: true,
       city: true,
-      imageUrl: true,
+      venueImages: {
+        where: { isPrimary: true },
+        take: 1,
+      },
       _count: {
         select: { courts: true },
       },
@@ -130,7 +139,7 @@ export async function getVenueForAdmin(id: string) {
       courts: {
         orderBy: { name: "asc" },
       },
-      admins: {
+      venueAccess: {
         include: {
           user: {
             select: {
@@ -147,6 +156,7 @@ export async function getVenueForAdmin(id: string) {
           facility: true,
         },
       },
+      venueImages: true,
     },
   });
 }
@@ -170,7 +180,10 @@ export async function getVenuesByCity(city: string) {
       description: true,
       address: true,
       city: true,
-      imageUrl: true,
+      venueImages: {
+        where: { isPrimary: true },
+        take: 1,
+      },
       _count: {
         select: { courts: true },
       },

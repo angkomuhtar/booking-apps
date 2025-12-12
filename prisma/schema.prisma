@@ -8,16 +8,57 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(cuid())
-  name        String
-  email       String       @unique
-  password    String
-  phone       String?
-  role        Role         @default(USER)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  bookings    Booking[]
-  venueAdmins VenueAdmin[]
+  id              String         @id @default(cuid())
+  name            String
+  email           String         @unique
+  password        String
+  phone           String?
+  roleId          String?
+  accessAllVenues Boolean        @default(false)
+  createdById     String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  bookings        Booking[]
+  venueAccess     VenueAccess[]
+  adminRequests   AdminRequest[]
+  role            Role?          @relation(fields: [roleId], references: [id])
+  createdBy       User?          @relation("CreatedByUser", fields: [createdById], references: [id])
+  createdUsers    User[]         @relation("CreatedByUser")
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  isSystem    Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  code        String           @unique
+  group       String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
 }
 
 model Venue {
@@ -29,11 +70,10 @@ model Venue {
   provinceId      String
   location        String?
   venueImages     VenueImage[]
-  imageUrl        String?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   courts          Court[]
-  admins          VenueAdmin[]
+  venueAccess     VenueAccess[]
   venueFacilities venueFacility[]
   province        province        @relation(fields: [provinceId], references: [id], onDelete: Cascade)
   city            city            @relation(fields: [cityId], references: [id], onDelete: Cascade)
@@ -79,7 +119,7 @@ model Booking {
   @@index([date])
 }
 
-model VenueAdmin {
+model VenueAccess {
   id        String   @id @default(cuid())
   userId    String
   venueId   String
@@ -139,18 +179,20 @@ model province {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cities city[]
-  venues Venue[]
+  cities        city[]
+  venues        Venue[]
+  adminRequests AdminRequest[]
 }
 
 model city {
-  id         String   @id
-  name       String
-  provinceId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  province   province @relation(fields: [provinceId], references: [id], onDelete: Cascade)
-  venues     Venue[]
+  id            String         @id
+  name          String
+  provinceId    String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  province      province       @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+  venues        Venue[]
+  adminRequests AdminRequest[]
 
   @@index([provinceId])
 }
@@ -169,10 +211,30 @@ model VenueImage {
   @@index([isPrimary])
 }
 
-enum Role {
-  USER
-  VENUE_ADMIN
-  SUPER_ADMIN
+model AdminRequest {
+  id           String             @id @default(cuid())
+  userId       String
+  venueName    String
+  venueAddress String
+  cityId       String
+  provinceId   String
+  description  String?
+  status       AdminRequestStatus @default(PENDING)
+  rejectReason String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  province     province           @relation(fields: [provinceId], references: [id])
+  city         city               @relation(fields: [cityId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum AdminRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum CourtType {

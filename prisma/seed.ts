@@ -6,6 +6,22 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
+  const superAdminRole = await prisma.role.findUnique({
+    where: { name: "Super Admin" },
+  });
+  const venueAdminRole = await prisma.role.findUnique({
+    where: { name: "Venue Admin" },
+  });
+  const userRole = await prisma.role.findUnique({
+    where: { name: "User" },
+  });
+
+  if (!superAdminRole || !venueAdminRole || !userRole) {
+    console.log("❌ Please run role_permission_seed.ts first!");
+    console.log("   npx ts-node prisma/role_permission_seed.ts");
+    process.exit(1);
+  }
+
   const adminPassword = await bcrypt.hash("admin123", 10);
   const venueAdminPassword = await bcrypt.hash("venueadmin123", 10);
   const userPassword = await bcrypt.hash("user123", 10);
@@ -17,7 +33,8 @@ async function main() {
       email: "admin@email.com",
       name: "Super Admin",
       password: adminPassword,
-      role: "SUPER_ADMIN",
+      roleId: superAdminRole.id,
+      accessAllVenues: true,
       phone: "081234567890",
     },
   });
@@ -29,7 +46,8 @@ async function main() {
       email: "venueadmin@email.com",
       name: "Venue Admin",
       password: venueAdminPassword,
-      role: "VENUE_ADMIN",
+      roleId: venueAdminRole.id,
+      accessAllVenues: false,
       phone: "081234567899",
     },
   });
@@ -41,7 +59,7 @@ async function main() {
       email: "user@email.com",
       name: "John Doe",
       password: userPassword,
-      role: "USER",
+      roleId: userRole.id,
       phone: "081234567891",
     },
   });
@@ -59,7 +77,6 @@ async function main() {
       address: "Jl. Sudirman No. 123",
       cityId: "3171",
       provinceId: "31",
-      imageUrl: "/images/venue1.jpg",
     },
   });
 
@@ -70,13 +87,12 @@ async function main() {
       address: "Jl. Dago No. 456",
       cityId: "3273",
       provinceId: "32",
-      imageUrl: "/images/venue2.jpg",
     },
   });
 
   console.log("✅ Created venues:", venue1.name, venue2.name);
 
-  await prisma.venueAdmin.create({
+  await prisma.venueAccess.create({
     data: {
       userId: venueAdmin.id,
       venueId: venue1.id,

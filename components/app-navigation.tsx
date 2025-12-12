@@ -1,9 +1,6 @@
-import {
-  BadgeDollarSign,
-  Menu,
-  ShoppingCart,
-  User2,
-} from "lucide-react";
+// "use client";
+
+import { BadgeDollarSign, Menu, ShoppingCart, User2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import {
@@ -25,11 +22,14 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { auth } from "@/auth";
-import { Button } from "./ui/button";
-import { Icon } from "@iconify/react";
+import CartList from "./cartList";
 
 const AppNav = async () => {
   const session = await auth();
+
+  // const { items, removeItem, totalPrice, clearCart } = useCartStore();
+
+  const items: unknown[] = [];
 
   return (
     <header className='bg-white border-b sticky top-0 z-50 shadow-xs'>
@@ -64,92 +64,9 @@ const AppNav = async () => {
             </Link>
           </nav>
 
-          <nav className='flex sm:gap-6 gap-3 items-center min-h-10'>
-            <Sheet>
-              <SheetTrigger className='cursor-pointer'>
-                <ShoppingCart className='w-6 h-6 ' />
-              </SheetTrigger>
-              <SheetContent className='right-4 inset-y-4 rounded-md h-auto sm:max-w-lg'>
-                <SheetHeader>
-                  <SheetTitle>Cart</SheetTitle>
-                </SheetHeader>
-                <div className='grid flex-1 auto-rows-min gap-4 px-4'>
-                  <div className='border border-input shadow-xs rounded-md p-4 flex gap-4'>
-                    <div className='flex flex-col justify-center w-full gap-2.5'>
-                      <div className='flex items-center flex-wrap justify-between gap-2.5'>
-                        <a
-                          className='hover:text-primary-active font-semibold text-dark leading-5.5'
-                          href='#'>
-                          Stadion Glora Kadrie Oening
-                        </a>
-                      </div>
-                      <div className='grid grid-cols-2 sm:flex justify-between'>
-                        <div className='flex flex-col text-[11px]'>
-                          <span className='text-muted-foreground font-light'>
-                            Court :
-                          </span>
-                          <span className='font-semibold leading-3'>
-                            Lapangan A
-                          </span>
-                        </div>
-                        <div className='flex flex-col text-[11px]'>
-                          <span className='text-muted-foreground font-light'>
-                            Tipe :
-                          </span>
-                          <span className='font-semibold leading-3'>
-                            badminton
-                          </span>
-                        </div>
-                        <div className='flex flex-col text-[11px]'>
-                          <span className='text-muted-foreground font-light'>
-                            Sesi :
-                          </span>
-                          <span className='font-semibold leading-3'>
-                            10:00 - 11:00
-                          </span>
-                        </div>
-                        <div className='flex flex-col text-[11px]'>
-                          <span className='text-muted-foreground font-light'>
-                            Tanggal :
-                          </span>
-                          <span className='font-semibold leading-3'>
-                            20 Nov 2024
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className='flex flex-col items-end justify-between gap-3'>
-                      <div className='flex flex-col'>
-                        <span className='text-[11px] text-muted-foreground font-thin line-through'>
-                          Rp.300.000
-                        </span>
-                        <span className='text-sm font-medium text-dark'>
-                          Rp.250.000
-                        </span>
-                      </div>
-                      <button
-                        data-slot='button'
-                        className='cursor-pointer group justify-center text-red-500 border border-red-500 rounded-sm p-1'>
-                        <Icon icon='lucide:trash-2' className='size-3' />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <SheetFooter className='flex-row gap-2 mt-4'>
-                  <Button variant='outline' className=''>
-                    Clear Cart
-                  </Button>
-                  <Button type='submit' className='bg-primary flex-1'>
-                    <Icon
-                      icon='material-symbols:shopping-cart-checkout-rounded'
-                      className='w-5 h-5'
-                    />
-                    Checkout
-                  </Button>
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
-            <div className='w-[1px] bg-border h-5'></div>
+          <nav className='flex md:gap-6 gap-3 items-center min-h-10'>
+            <CartList />
+            <div className='w-px bg-border h-5'></div>
             {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -167,10 +84,6 @@ const AppNav = async () => {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
-                      Profile
-                      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
                       Billing
                       <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                     </DropdownMenuItem>
@@ -182,6 +95,14 @@ const AppNav = async () => {
                       Keyboard shortcuts
                       <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
                     </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    {session.user?.role != "USER" && (
+                      <DropdownMenuItem asChild className='cursor-pointer'>
+                        <Link href='/admin'>Admin Page</Link>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>

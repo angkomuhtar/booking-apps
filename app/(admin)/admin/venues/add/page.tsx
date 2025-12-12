@@ -105,7 +105,7 @@ export default function AddVenuePage() {
       preview: URL.createObjectURL(file),
       name: file.name,
     }));
-    var check = currentImages.find((img) =>
+    const check = currentImages.find((img) =>
       newImages.some((newImg) => newImg.name === img.name)
     );
 

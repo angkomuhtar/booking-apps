@@ -15,7 +15,7 @@ export async function getUsers() {
       _count: {
         select: {
           bookings: true,
-          venueAdmins: true,
+          venueAccess: true,
         },
       },
     },
@@ -26,7 +26,7 @@ export async function getUsers() {
 export async function getUserById(id: string) {
   const session = await requireAuth();
 
-  if (session.user.id !== id && session.user.role !== "SUPER_ADMIN") {
+  if (session.user.id !== id && session.user.role !== "Super Admin") {
     throw new Error("Forbidden: Cannot access other user's data");
   }
 
@@ -53,7 +53,7 @@ export async function getUserById(id: string) {
 export async function getUserProfile(id: string) {
   const session = await requireAuth();
 
-  if (session.user.id !== id && session.user.role !== "SUPER_ADMIN") {
+  if (session.user.id !== id && session.user.role !== "Super Admin") {
     throw new Error("Forbidden: Cannot access other user's profile");
   }
 
@@ -112,7 +112,9 @@ export async function getVenueAdmins() {
 
   return await prisma.user.findMany({
     where: {
-      role: "VENUE_ADMIN",
+      role: {
+        name: "Venue Admin",
+      },
     },
     select: {
       id: true,
@@ -120,7 +122,7 @@ export async function getVenueAdmins() {
       email: true,
       phone: true,
       createdAt: true,
-      venueAdmins: {
+      venueAccess: {
         select: {
           venue: {
             select: {
@@ -136,11 +138,15 @@ export async function getVenueAdmins() {
   });
 }
 
-export async function getUsersByRole(role: "USER" | "VENUE_ADMIN" | "SUPER_ADMIN") {
+export async function getUsersByRoleName(roleName: string) {
   await requireSuperAdmin();
 
   return await prisma.user.findMany({
-    where: { role },
+    where: {
+      role: {
+        name: roleName,
+      },
+    },
     select: {
       id: true,
       name: true,

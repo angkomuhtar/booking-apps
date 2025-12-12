@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,12 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Dot,
-  Home,
-  MapPin,
-  Star,
-} from "lucide-react";
+import { Dot, Home, MapPin, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -40,8 +37,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useCartStore } from "@/store/useCartStore";
+import { toast } from "sonner";
 
-const page = () => {
+const Page = () => {
+  const { addItem } = useCartStore();
   const facilities = [
     { value: "parking", label: "Parkir", icon: "mdi:car" },
     { value: "shower", label: "Shower", icon: "mingcute:shower-line" },
@@ -121,35 +121,31 @@ const page = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className='grid grid-cols-4 gap-2 relative'>
-        <div className='relative col-span-2 row-span-2'>
-          <Image
-            src={"/image/venue-1.jpg"}
-            alt='Venue Banner'
-            fill
-            unoptimized
-            className='rounded-lg object-cover'
-          />
-        </div>
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-2 relative'>
+        <img
+          src='/image/venue-1.jpg'
+          alt='Venue Banner'
+          className='rounded-lg first:col-span-2 md:first:row-span-2 object-cover not-first:h-full'
+        />
         <img
           src='/image/venue-2.jpeg'
           alt='Venue Banner'
-          className='rounded-lg'
+          className='rounded-lg object-cover h-full'
         />
         <img
           src='/image/venue-3.jpeg'
           alt='Venue Banner'
-          className='rounded-lg'
+          className='rounded-lg object-cover h-full'
         />
         <img
           src='/image/venue-4.jpg'
           alt='Venue Banner'
-          className='rounded-lg'
+          className='rounded-lg object-cover h-full'
         />
         <img
           src='/image/venue-5.jpg'
           alt='Venue Banner'
-          className='rounded-lg'
+          className='rounded-lg object-cover h-full'
         />
         <button
           type='button'
@@ -271,22 +267,27 @@ const page = () => {
           </div>
           <h3 className='text-3xl font-semibold flex-1'>Pilihan Lapangan</h3>
         </div>
-        <div className='grid grid-cols-7 gap-4 mt-6 mb-4 items-stretch'>
-          <div className='col-span-5 grid grid-cols-7 gap-2'>
-            {Array.from({ length: 7 }).map((_, index) => (
-              <div
-                key={index}
-                className='border border-primary rounded-lg overflow-hidden cursor-pointer flex flex-col items-center justify-center py-1 bg-white'>
-                <h6 className='text-xs font-light text-muted-foreground text-center'>
-                  {moment().add(index, "days").format("dddd")}
-                </h6>
-                <p className='font-semibold'>
-                  {moment().add(index, "days").format("DD MMM")}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className='col-span-2 flex justify-center items-center gap-4'>
+        <div className='grid grid-cols-7 mt-6 mb-4 items-center gap-2 md:flex'>
+          <Carousel className='w-full col-span-5'>
+            <CarouselContent className=' ml-0'>
+              {Array.from({ length: 7 }).map((_, index) => (
+                <CarouselItem
+                  key={index}
+                  className='px-1 basis-1/3 md:basis-1/5 lg:basis-1/7'>
+                  <div className='border border-primary rounded-lg cursor-pointer flex flex-col items-center justify-center py-1 px-4 bg-white'>
+                    <h6 className='text-xs font-light text-muted-foreground text-center'>
+                      {moment().add(index, "days").format("dddd")}
+                    </h6>
+                    <p className='font-semibold text-nowrap text-xs'>
+                      {moment().add(index, "days").format("DD MMM")}
+                    </p>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+
+          <div className='flex md:ajustify-end items-center gap-2 col-span-2'>
             <Popover>
               <PopoverTrigger asChild>
                 <button className='border border-primary text-primary bg-white p-2 rounded-md font-semibold cursor-pointer'>
@@ -309,16 +310,18 @@ const page = () => {
                 />
               </PopoverContent>
             </Popover>
-            <button className='bg-white border border-primary text-primary px-4 py-2 rounded-md w-full flex-1 font-semibold cursor-pointer'>
+            <button className='bg-white border border-primary text-primary p-2 rounded-md font-semibold cursor-pointer flex items-center'>
               <Icon
                 icon='mdi:filter-outline'
-                className='size-5 inline-block mr-2'
+                className='size-5 inline-block lg:mr-2'
               />
-              <span>Filter & Sort</span>
+              <span className='hidden lg:inline text-nowrap'>
+                Filter & Sort
+              </span>
             </button>
           </div>
         </div>
-        <div className='grid grid-cols-3 gap-4 items-start mb-4'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 items-start mb-4'>
           <Carousel className='w-full'>
             <CarouselContent>
               {Array.from({ length: 5 }).map((_, index) => (
@@ -341,25 +344,16 @@ const page = () => {
             <span className='text-sm font-medium text-muted-foreground'>
               Indoor Hard Court
             </span>
-            <div className='grid gap-2 mt-2'>
-              <div className='flex items-center space-x-2'>
-                <Icon icon='cil:tennis' className='size-5 text-primary' />
-                <span className='text-sm font-medium text-muted-foreground'>
-                  Tennis
-                </span>
-              </div>
-              <div className='flex items-center space-x-2'>
-                <Icon icon='cil:tennis' className='size-5 text-primary' />
-                <span className='text-sm font-medium text-muted-foreground'>
-                  Indoor
-                </span>
-              </div>
-              <div className='flex items-center space-x-2'>
-                <Icon icon='cil:tennis' className='size-5 text-primary' />
-                <span className='text-sm font-medium text-muted-foreground'>
-                  Hard Court
-                </span>
-              </div>
+            <div className='flex gap-2 mt-2'>
+              <span className='text-xs font-semibold px-2 bg-primary/40 rounded-xs text-white'>
+                Tennis
+              </span>
+              <span className='text-xs font-semibold px-2 bg-primary/40 rounded-xs text-white'>
+                Indoor
+              </span>
+              <span className='text-xs font-semibold px-2 bg-primary/40 rounded-xs text-white'>
+                Hard Court
+              </span>
             </div>
             <Accordion
               type='single'
@@ -370,11 +364,20 @@ const page = () => {
                 <AccordionTrigger className='cursor-pointer'>
                   Jadwal Lapangan
                 </AccordionTrigger>
-                <AccordionContent className='grid gap-4 grid-cols-5 py-2'>
+                <AccordionContent className='grid gap-4 grid-cols-2 md:grid-cols-5 py-2'>
                   {Array.from({ length: 20 }).map((_, index) => (
                     <div
+                      onClick={() => {
+                        addItem({
+                          id: `lapangan-a-06-00-07-00${index}`,
+                          name: `Lapangan A - 06:00 - 07:00`,
+                          price: 280000,
+                          quantity: 1,
+                        });
+                        toast("Berhasil menambahkan ke keranjang!");
+                      }}
                       key={index}
-                      className='text-center rounded-md border p-2'>
+                      className='text-center rounded-md border p-2 cursor-pointer hover:bg-primary/10'>
                       <p className='text-xs text-muted-foreground font-semibold'>
                         60 Menit
                       </p>
@@ -396,4 +399,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

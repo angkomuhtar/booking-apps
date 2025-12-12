@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     const uploadPromises = files.map(async (file) => {
       const buffer = Buffer.from(await file.arrayBuffer())
-      return uploadToR2(buffer, file.name, file.type)
+      return uploadToR2(buffer, file.name, file.type, "uploads")
     })
 
     const urls = await Promise.all(uploadPromises)
