@@ -31,7 +31,7 @@ export async function getVenues() {
 export async function getVenueById(id: string) {
   const venue = await prisma.venue.findUnique({
     where: { id },
-    select: {
+select: {
       id: true,
       name: true,
       description: true,
@@ -39,6 +39,8 @@ export async function getVenueById(id: string) {
       city: true,
       province: true,
       location: true,
+      openingTime: true,
+      closingTime: true,
       venueImages: true,
       createdAt: true,
       courts: {

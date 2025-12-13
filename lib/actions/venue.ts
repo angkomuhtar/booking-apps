@@ -42,6 +42,9 @@ export async function createVenue(data: CreateVenueInput) {
         address: validatedData.address,
         cityId: validatedData.city,
         provinceId: validatedData.province || "",
+        rules: validatedData.rules || "",
+        openingTime: validatedData.openingTime,
+        closingTime: validatedData.closingTime,
         venueImages: {
           createMany: {
             data: uploadedUrls.map((img) => ({

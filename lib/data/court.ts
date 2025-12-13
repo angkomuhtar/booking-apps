@@ -4,7 +4,7 @@ import { CourtType } from "@prisma/client";
 
 export async function getCourts() {
   return await prisma.court.findMany({
-    where: { isActive: true },
+    // where: { isActive: true },
     select: {
       id: true,
       name: true,
@@ -124,10 +124,7 @@ export async function getCourtsForAdmin(venueId: string) {
   });
 }
 
-export async function getCourtWithBookings(
-  courtId: string,
-  date: Date
-) {
+export async function getCourtWithBookings(courtId: string, date: Date) {
   const court = await prisma.court.findUnique({
     where: { id: courtId },
     select: {
@@ -140,6 +137,8 @@ export async function getCourtWithBookings(
         select: {
           id: true,
           name: true,
+          openingTime: true,
+          closingTime: true,
         },
       },
       bookings: {
@@ -170,12 +169,9 @@ export async function getCourtWithBookings(
   return court;
 }
 
-export async function getAvailableTimeSlots(
-  courtId: string,
-  date: Date
-) {
+export async function getAvailableTimeSlots(courtId: string, date: Date) {
   const court = await getCourtWithBookings(courtId, date);
-  
+
   const bookedSlots = court.bookings.map((booking) => ({
     start: booking.startTime,
     end: booking.endTime,

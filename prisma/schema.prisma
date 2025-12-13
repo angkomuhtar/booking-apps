@@ -69,6 +69,9 @@ model Venue {
   cityId          String
   provinceId      String
   location        String?
+  rules           String?
+  openingTime     String          @default("06:00")
+  closingTime     String          @default("23:00")
   venueImages     VenueImage[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt

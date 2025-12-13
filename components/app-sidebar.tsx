@@ -9,6 +9,7 @@ import {
   Settings,
   GalleryVerticalEnd,
   Computer,
+  InspectionPanel,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -51,6 +52,12 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         title: "Venues",
         url: "/admin/venues",
         icon: Building2,
+        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+      },
+      {
+        title: "Courts",
+        url: "/admin/courts",
+        icon: InspectionPanel,
         roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
       },
       {

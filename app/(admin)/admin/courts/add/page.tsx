@@ -66,8 +66,6 @@ export default function AddVenuePage() {
       rules: "",
       facilities: [],
       images: [],
-      openingTime: "08:00",
-      closingTime: "22:00",
     },
   });
 
@@ -323,52 +321,6 @@ export default function AddVenuePage() {
               {errors.city && (
                 <p className='form-error'>{errors.city.message}</p>
               )}
-            </div>
-
-            <div className='grid grid-cols-2 gap-4'>
-              <div className='flex flex-col gap-2.5'>
-                <label htmlFor='openingTime' className='form-label'>
-                  Waktu Buka <span className='text-red-500'>*</span>
-                </label>
-                <Controller
-                  name='openingTime'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type='time'
-                      id='openingTime'
-                      className='form-control'
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-                {errors.openingTime && (
-                  <p className='form-error'>{errors.openingTime.message}</p>
-                )}
-              </div>
-
-              <div className='flex flex-col gap-2.5'>
-                <label htmlFor='closingTime' className='form-label'>
-                  Waktu Tutup <span className='text-red-500'>*</span>
-                </label>
-                <Controller
-                  name='closingTime'
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type='time'
-                      id='closingTime'
-                      className='form-control'
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-                {errors.closingTime && (
-                  <p className='form-error'>{errors.closingTime.message}</p>
-                )}
-              </div>
             </div>
           </div>
 
