@@ -44,11 +44,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error("Invalid email or password");
           }
 
+          const permissions = user.role?.permissions.map(
+            (rp) => rp.permission.code
+          ) || [];
+
           return {
             id: user.id,
             email: user.email,
             name: user.name,
             role: user.role?.name || "User",
+            permissions,
             accessAllVenues: user.accessAllVenues,
           };
         } catch (error) {
@@ -63,6 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.permissions = user.permissions;
         token.accessAllVenues = user.accessAllVenues;
       }
       return token;
@@ -71,6 +77,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.permissions = token.permissions as string[];
         session.user.accessAllVenues = token.accessAllVenues as boolean;
       }
       return session;

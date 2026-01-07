@@ -40,49 +40,53 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         title: "Dashboard",
         url: "/admin",
         icon: LayoutDashboard,
-        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+        roles: ["Super Admin", "Venue Admin"],
       },
       {
         title: "Cashier",
         url: "/cashier",
         icon: Computer,
-        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+        roles: ["Super Admin", "Venue Admin", "Cashier"],
       },
       {
         title: "Venues",
         url: "/admin/venues",
         icon: Building2,
-        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+        roles: ["Super Admin", "Venue Admin"],
       },
       {
         title: "Courts",
         url: "/admin/courts",
         icon: InspectionPanel,
-        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+        roles: ["Super Admin", "Venue Admin"],
       },
       {
         title: "Bookings",
         url: "/admin/bookings",
         icon: Calendar,
-        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+        roles: ["Super Admin", "Venue Admin", "Cashier"],
       },
       {
         title: "Users",
         url: "/admin/users",
         icon: Users,
-        roles: ["SUPER_ADMIN"],
+        roles: ["Super Admin"],
       },
       {
         title: "Settings",
         icon: Settings,
-        roles: ["SUPER_ADMIN", "VENUE_ADMIN"],
+        roles: ["Super Admin", "Venue Admin"],
         child: [
           {
             title: "Roles",
             url: "/admin/settings/roles",
+            roles: ["Super Admin"],
           },
-          { title: "Permissions", url: "/admin/settings/permissions" },
-          { title: "User Roles", url: "/admin/settings/user-roles" },
+          {
+            title: "Permissions",
+            url: "/admin/settings/permissions",
+            roles: ["Super Admin"],
+          },
         ],
       },
     ];
@@ -96,15 +100,14 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     {
       name: "Ayo Booking",
       logo: GalleryVerticalEnd,
-      plan: user?.role === "SUPER_ADMIN" ? "Super Admin" : "Venue Admin",
+      plan: user?.role,
     },
   ];
-
-  console.log("user from Nav", user);
 
   return (
     <Sidebar collapsible='icon' {...props} className='bg-white'>
       <SidebarHeader>
+        {" "}
         <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>

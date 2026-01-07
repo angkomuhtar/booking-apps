@@ -11,16 +11,8 @@ import React from "react";
 import AppBreadcrumb from "@/components/app-breadcrumb";
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
-
-  if (!session?.user) {
+  if (!session || session.user.role == "User") {
     redirect("/login");
-  }
-
-  if (
-    session.user.role !== "SUPER_ADMIN" &&
-    session.user.role !== "VENUE_ADMIN"
-  ) {
-    redirect("/");
   }
 
   return (

@@ -1,26 +1,26 @@
 import { auth } from "@/auth";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Icon } from "@iconify/react";
-import { getVenues } from "@/lib/actions/venue";
-import { DataTable } from "@/components/data-table";
-import { columns } from "./columns";
+import { getRoles } from "@/lib/actions/role";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { RolesClient } from "./roles-client";
+import RoleAddForm from "./role-add-form";
+import { getPermissions } from "@/lib/actions/permission";
 
 export default async function AdminVenuesPage() {
   const session = await auth();
-
-  if (!session) {
+  if (!session || session.user.role == "User") {
     redirect("/login");
   }
 
-  if (
-    session.user.role !== "SUPER_ADMIN" &&
-    session.user.role !== "VENUE_ADMIN"
-  ) {
-    redirect("/");
-  }
-
-  const result = await getVenues();
+  const result = await getRoles();
+  const permissions = await getPermissions();
 
   return (
     <div className='flex flex-1 flex-col p-4 pt-0 font-sans'>
@@ -30,22 +30,12 @@ export default async function AdminVenuesPage() {
           <div className='flex items-center gap-2 text-sm font-normal text-muted-foreground'></div>
         </div>
         <div className='flex items-center gap-2.5'>
-          <Link
-            href='/admin/venues/add'
-            className='bg-white border border-muted-foreground rounded-md px-4 py-2 inline-flex justify-center items-center gap-2 text-sm font-medium text-muted-foreground cursor-pointer hover:bg-black hover:text-white transition-colors'>
-            <Icon icon='heroicons:plus-16-solid' className='size-4' />
-            Tambah Data
-          </Link>
+          <RoleAddForm permissions={permissions.data} />
         </div>
       </div>
 
       {result.success ? (
-        <DataTable
-          columns={columns}
-          data={result.data}
-          searchKey='name'
-          searchPlaceholder='Cari venue...'
-        />
+        <RolesClient data={result.data} permissions={permissions.data} />
       ) : (
         <div className='bg-sidebar-accent min-h-72 rounded-md flex items-center justify-center'>
           <p className='text-muted-foreground'>{result.message}</p>

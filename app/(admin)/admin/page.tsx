@@ -7,51 +7,37 @@ import { getAccessibleVenueIds } from "@/lib/auth-helpers";
 
 export default async function AdminPage() {
   const session = await auth();
-
-  if (!session) {
+  if (!session || session.user.role == "User") {
     redirect("/login");
-  }
-
-  if (
-    session.user.role !== "SUPER_ADMIN" &&
-    session.user.role !== "VENUE_ADMIN"
-  ) {
-    redirect("/");
   }
 
   const accessibleVenueIds = await getAccessibleVenueIds();
 
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+  const isSuperAdmin = session?.user.role === "Super Admin";
 
-  const [userCount, venueCount, bookingCount, totalRevenue] = await Promise.all(
-    [
-      isSuperAdmin ? prisma.user.count() : 0,
-      isSuperAdmin ? prisma.venue.count() : accessibleVenueIds.length,
-      isSuperAdmin
-        ? prisma.booking.count()
-        : prisma.booking.count({
-            where: {
-              court: {
-                venueId: { in: accessibleVenueIds },
-              },
-            },
-          }),
-      isSuperAdmin
-        ? prisma.booking.aggregate({
-            _sum: { totalPrice: true },
-            where: { status: "CONFIRMED" },
-          })
-        : prisma.booking.aggregate({
-            _sum: { totalPrice: true },
-            where: {
-              status: "CONFIRMED",
-              court: {
-                venueId: { in: accessibleVenueIds },
-              },
-            },
-          }),
-    ]
-  );
+  const [userCount, venueCount, orderCount, totalRevenue] = await Promise.all([
+    isSuperAdmin ? prisma.user.count() : 0,
+    isSuperAdmin ? prisma.venue.count() : accessibleVenueIds.venueIds.length,
+    isSuperAdmin
+      ? prisma.order.count()
+      : prisma.order.count({
+          where: {
+            venueId: { in: accessibleVenueIds.venueIds },
+          },
+        }),
+    isSuperAdmin
+      ? prisma.order.aggregate({
+          _sum: { totalPrice: true },
+          where: { status: "COMPLETED" },
+        })
+      : prisma.order.aggregate({
+          _sum: { totalPrice: true },
+          where: {
+            status: "COMPLETED",
+            venueId: { in: accessibleVenueIds.venueIds },
+          },
+        }),
+  ]);
 
   return (
     <div className='flex flex-1 flex-col p-4 pt-0 font-sans'>
@@ -96,12 +82,12 @@ export default async function AdminPage() {
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>
-                {isSuperAdmin ? "Total Bookings" : "Venue Bookings"}
+                {isSuperAdmin ? "Total Orders" : "Venue Orders"}
               </CardTitle>
               <Calendar className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>{bookingCount}</div>
+              <div className='text-2xl font-bold'>{orderCount}</div>
             </CardContent>
           </Card>
 

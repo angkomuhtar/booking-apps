@@ -1,130 +1,124 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Icon } from "@iconify/react";
-import Link from "next/link";
-import { deleteVenue } from "@/lib/actions/venue";
-import { toast } from "sonner";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { GripVertical } from "lucide-react";
 
-export type VenueColumn = {
+export type RoleColumn = {
   id: string;
   name: string;
-  address: string;
-  city: { name: string } | null;
-  province: { name: string } | null;
-  venueFacilities: { facility: { name: string } }[];
+  description: string | null;
+  isSystem: boolean;
+  permissions?: {
+    permission: {
+      id: string;
+      name: string;
+      code: string;
+    };
+  }[];
   createdAt: Date;
 };
 
-export const columns: ColumnDef<VenueColumn>[] = [
+export type RoleTableMeta = {
+  onEdit: (role: RoleColumn) => void;
+  onDelete: (role: RoleColumn) => void;
+};
+
+export const columns: ColumnDef<RoleColumn>[] = [
   {
     accessorKey: "name",
-    header: "Nama Venue",
+    header: "Role Name",
   },
   {
-    accessorKey: "address",
-    header: "Alamat",
-    cell: ({ row }) => {
-      const address = row.original.address;
-      return <div className='max-w-xs truncate'>{address}</div>;
-    },
+    accessorKey: "description",
+    header: "Description",
   },
   {
-    accessorKey: "city.name",
-    header: "Kota",
-    cell: ({ row }) => row.original.city?.name || "-",
+    accessorKey: "permissions",
+    header: "Permissions",
+    cell: ({ row }) => (
+      <div className='flex flex-wrap gap-1'>
+        {row.original.permissions?.length == 0 ? (
+          <span className='text-xs py-1 rounded-md bg-red-500 px-2 text-white font-semibold'>
+            No Permissions
+          </span>
+        ) : (
+          <>
+            {row.original.permissions?.slice(0, 5).map((perm) => (
+              <span
+                key={perm.permission.id}
+                className='bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded-md self-start'>
+                {perm.permission.name}
+              </span>
+            ))}
+            {(row.original.permissions?.length ?? 0) > 5 && (
+              <HoverCard openDelay={100} closeDelay={100}>
+                <HoverCardTrigger asChild>
+                  <span className='inline-block bg-gray-300 text-gray-600 text-xs font-semibold px-2 py-1 rounded-md mr-1 mb-1 cursor-pointer'>
+                    +{(row.original.permissions?.length ?? 0) - 5} more
+                  </span>
+                </HoverCardTrigger>
+                <HoverCardContent className='w-md p-2' align='start'>
+                  <div className='flex flex-wrap gap-1'>
+                    {row.original.permissions?.slice(5).map((perm) => (
+                      <span
+                        key={perm.permission.id}
+                        className='bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded-md self-start'>
+                        {perm.permission.name}
+                      </span>
+                    ))}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            )}
+          </>
+        )}
+      </div>
+    ),
   },
   {
-    accessorKey: "province.name",
-    header: "Provinsi",
-    cell: ({ row }) => row.original.province?.name || "-",
-  },
-  {
-    id: "courts",
-    header: "Lapangan",
-    cell: ({ row }) => {
-      return `${row.original.venueFacilities.length} Lapangan`;
-    },
-  },
-  {
-    id: "facilities",
-    header: "Fasilitas",
-    cell: ({ row }) => {
-      return `${row.original.venueFacilities.length} fasilitas`;
-    },
+    accessorKey: "isSystem",
+    header: "System Role",
+    cell: ({ row }) => (row.original.isSystem ? "Yes" : "No"),
   },
   {
     id: "actions",
     header: "Aksi",
-    cell: ({ row }) => {
-      const venue = row.original;
-
-      const handleDelete = async () => {
-        const result = await deleteVenue(venue.id);
-        if (result.success) {
-          toast.success(result.message);
-          // window.location.reload();
-        } else {
-          toast.error(result.message);
-        }
-      };
+    cell: ({ row, table }) => {
+      const role = row.original;
+      const meta = table.options.meta as RoleTableMeta | undefined;
 
       return (
         <div className='flex gap-2 items-center'>
-          <button className='text-green-600 hover:text-white border-green-500 hover:bg-green-500 p-1 rounded-sm border  transition cursor-pointer'>
-            <Link href={`/admin/venues/${venue.id}/edit`}>
-              <Icon icon='heroicons:pencil' className='size-3' />
-            </Link>
-          </button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className='text-red-600 hover:text-white border-red-500 hover:bg-red-500 p-1 rounded-sm border  transition cursor-pointer'>
-                <Icon icon='heroicons:trash' className='size-3' />
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      );
-    },
-  },
-  {
-    id: "details",
-    header: "",
-    cell: ({ row }) => {
-      const venue = row.original;
-      return (
-        <div className='flex gap-2 items-center'>
-          <button className='p-1 cursor-pointer'>
-            <Link href={`/admin/venues/${venue.id}`}>
-              <Icon icon='heroicons-solid:chevron-right' className='size-4' />
-            </Link>
-          </button>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger className='focus-visible:outline-none'>
+              <GripVertical className='cursor-pointer size-4 text-muted-foreground' />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end' alignOffset={-32}>
+              <DropdownMenuLabel>Action</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => meta?.onEdit(role)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className='text-red-600 focus:text-red-600'
+                onSelect={() => meta?.onDelete(role)}>
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       );
     },

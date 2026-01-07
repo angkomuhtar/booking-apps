@@ -13,14 +13,15 @@ export default async function AdminVenuesPage() {
     redirect("/login");
   }
 
-  if (
-    session.user.role !== "SUPER_ADMIN" &&
-    session.user.role !== "VENUE_ADMIN"
-  ) {
-    redirect("/");
-  }
+  // if (
+  //   session.user.role !== "SUPER_ADMIN" &&
+  //   session.user.role !== "VENUE_ADMIN"
+  // ) {
+  //   redirect("/");
+  // }
 
   const result = await getVenues();
+  console.log(result.data);
 
   return (
     <div className='flex flex-1 flex-col p-4 pt-0 font-sans'>
@@ -42,11 +43,11 @@ export default async function AdminVenuesPage() {
       </div>
 
       {result.success ? (
-        <DataTable 
-          columns={columns} 
-          data={result.data} 
-          searchKey="name"
-          searchPlaceholder="Cari venue..."
+        <DataTable
+          columns={columns}
+          data={result.data}
+          searchKey='name'
+          searchPlaceholder='Cari venue...'
         />
       ) : (
         <div className='bg-sidebar-accent min-h-72 rounded-md flex items-center justify-center'>

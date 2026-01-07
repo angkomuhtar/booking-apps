@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -16,15 +15,11 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import ProductCard from "@/components/custom-ui/product-card";
+import { getPopularVenues } from "@/lib/data/home";
 
 export default async function Home() {
-  const venues = await prisma.venue.findMany({
-    include: {
-      courts: true,
-      city: true,
-    },
-    take: 6,
-  });
+  const venues = await getPopularVenues();
+  console.log(venues);
 
   return (
     <>
@@ -185,7 +180,7 @@ export default async function Home() {
             {venues.length === 0 ? (
               <div>No venues found.</div>
             ) : (
-              venues.map((venue) => <ProductCard key={venue.id} />)
+              venues.map((venue) => <ProductCard key={venue.id} data={venue} />)
             )}
           </div>
         </section>

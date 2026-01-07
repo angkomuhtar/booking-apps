@@ -1,34 +1,62 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
+const protectedRoutes = ["/bookings", "/orders", "/profile"];
+
+function getRequiredPermission(pathname: string): string | null {
+  if (!pathname.startsWith("/admin")) return null;
+
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 1) return "admin.access";
+
+  if (segments[1] === "settings" && segments.length > 2) {
+    const subModule = segments[2].replace(/-/g, "_");
+    return `${subModule}.view`;
+  }
+
+  const module = segments[1].replace(/-/g, "_");
+  return `${module}.view`;
+}
+
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
-  const isAuthPage = req.nextUrl.pathname.startsWith("/login") || 
-                     req.nextUrl.pathname.startsWith("/register");
-  const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
-  const isVenueAdminPage = req.nextUrl.pathname.startsWith("/venue-admin");
-  
-  const userRole = req.auth?.user?.role;
+  const userPermissions = req.auth?.user?.permissions || [];
+  const pathname = req.nextUrl.pathname;
 
+  const isAuthPage =
+    pathname.startsWith("/login") || pathname.startsWith("/register");
   if (isAuthPage && isLoggedIn) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  if (!isLoggedIn && !isAuthPage && req.nextUrl.pathname !== "/") {
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (isProtectedRoute && !isLoggedIn) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (isAdminPage && userRole !== "SUPER_ADMIN") {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  if (isVenueAdminPage && userRole !== "VENUE_ADMIN" && userRole !== "SUPER_ADMIN") {
-    return NextResponse.redirect(new URL("/", req.url));
+  const requiredPermission = getRequiredPermission(pathname);
+  if (requiredPermission) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    if (!userPermissions.includes(requiredPermission)) {
+      return NextResponse.redirect(new URL("/forbidden", req.url));
+    }
   }
 
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/admin/:path*",
+    "/bookings/:path*",
+    "/orders/:path*",
+    "/profile/:path*",
+    "/login",
+    "/register",
+  ],
 };

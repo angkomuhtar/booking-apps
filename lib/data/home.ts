@@ -1,13 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { requireVenueAccess } from "@/lib/auth-helpers";
 
-export async function getVenues() {
-  return await prisma.venue.findMany({
-    where: {
-      courts: {
-        some: { isActive: true },
-      },
-    },
+export async function getPopularVenues() {
+  const venues = await prisma.venue.findMany({
     select: {
       id: true,
       name: true,
@@ -15,6 +10,8 @@ export async function getVenues() {
       address: true,
       city: true,
       province: true,
+      totalReviews: true,
+      rating: true,
       venueImages: {
         where: { isPrimary: true },
         take: 1,
@@ -23,15 +20,39 @@ export async function getVenues() {
       _count: {
         select: { courts: true },
       },
+      courts: {
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          courtType: true,
+          pricePerHour: true,
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
+  });
+
+  return venues.map((venue) => {
+    const lowestPrice = venue.courts.length > 0
+      ? Math.min(...venue.courts.map((court) => Number(court.pricePerHour)))
+      : null;
+
+    return {
+      ...venue,
+      lowestPrice,
+      courtTypes: [
+        ...new Set(venue.courts.map((court) => court.courtType?.name)),
+      ],
+    };
   });
 }
 
 export async function getVenueById(id: string) {
   const venue = await prisma.venue.findUnique({
     where: { id },
-select: {
+    select: {
       id: true,
       name: true,
       description: true,
@@ -197,7 +218,7 @@ export async function getVenuesByCity(city: string) {
 export async function getVenueStats(venueId: string) {
   await requireVenueAccess(venueId);
 
-  const [totalCourts, activeCourts, totalBookings, pendingBookings] =
+  const [totalCourts, activeCourts, totalOrders, pendingOrders] =
     await Promise.all([
       prisma.court.count({
         where: { venueId },
@@ -205,14 +226,12 @@ export async function getVenueStats(venueId: string) {
       prisma.court.count({
         where: { venueId, isActive: true },
       }),
-      prisma.booking.count({
-        where: {
-          court: { venueId },
-        },
+      prisma.order.count({
+        where: { venueId },
       }),
-      prisma.booking.count({
+      prisma.order.count({
         where: {
-          court: { venueId },
+          venueId,
           status: "PENDING",
         },
       }),
@@ -221,7 +240,7 @@ export async function getVenueStats(venueId: string) {
   return {
     totalCourts,
     activeCourts,
-    totalBookings,
-    pendingBookings,
+    totalOrders,
+    pendingOrders,
   };
 }

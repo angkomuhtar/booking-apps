@@ -14,7 +14,7 @@ import {
 import { format } from "date-fns";
 import { getAccessibleVenueIds } from "@/lib/auth-helpers";
 
-export default async function AdminBookingsPage() {
+export default async function AdminOrdersPage() {
   const session = await auth();
 
   if (!session) {
@@ -28,21 +28,16 @@ export default async function AdminBookingsPage() {
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
   const accessibleVenueIds = await getAccessibleVenueIds();
 
-  const bookings = await prisma.booking.findMany({
+  const orders = await prisma.order.findMany({
     where: isSuperAdmin
       ? {}
       : {
-          court: {
-            venueId: { in: accessibleVenueIds },
-          },
+          venueId: { in: accessibleVenueIds.venueIds },
         },
     include: {
       user: true,
-      court: {
-        include: {
-          venue: true,
-        },
-      },
+      venue: true,
+      items: true,
     },
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -50,7 +45,7 @@ export default async function AdminBookingsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "CONFIRMED":
+      case "PAID":
         return "bg-green-500";
       case "PENDING":
         return "bg-yellow-500";
@@ -58,6 +53,10 @@ export default async function AdminBookingsPage() {
         return "bg-red-500";
       case "COMPLETED":
         return "bg-blue-500";
+      case "PROCESSING":
+        return "bg-purple-500";
+      case "REFUNDED":
+        return "bg-gray-500";
       default:
         return "bg-gray-500";
     }
@@ -66,11 +65,11 @@ export default async function AdminBookingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Manage Bookings</h1>
+        <h1 className="text-3xl font-bold">Manage Orders</h1>
         <p className="text-muted-foreground">
           {isSuperAdmin 
-            ? "All bookings in the system" 
-            : "Bookings for your venues"}
+            ? "All orders in the system" 
+            : "Orders for your venues"}
         </p>
       </div>
 
@@ -79,36 +78,32 @@ export default async function AdminBookingsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
+                <TableHead>Order #</TableHead>
                 <TableHead>User</TableHead>
                 <TableHead>Venue</TableHead>
-                <TableHead>Court</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Price</TableHead>
+                <TableHead>Items</TableHead>
+                <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bookings.map((booking) => (
-                <TableRow key={booking.id}>
+              {orders.map((order) => (
+                <TableRow key={order.id}>
                   <TableCell className="font-mono text-xs">
-                    {booking.id.substring(0, 8)}...
+                    {order.orderNumber}
                   </TableCell>
-                  <TableCell>{booking.user.name}</TableCell>
-                  <TableCell>{booking.court.venue.name}</TableCell>
-                  <TableCell>{booking.court.name}</TableCell>
+                  <TableCell>{order.user.name}</TableCell>
+                  <TableCell>{order.venue.name}</TableCell>
+                  <TableCell>{order.items.length} item(s)</TableCell>
+                  <TableCell>Rp {order.totalPrice.toLocaleString()}</TableCell>
                   <TableCell>
-                    {format(new Date(booking.date), "dd/MM/yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    {booking.startTime} - {booking.endTime}
-                  </TableCell>
-                  <TableCell>Rp {booking.totalPrice.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(booking.status)}>
-                      {booking.status}
+                    <Badge className={getStatusColor(order.status)}>
+                      {order.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(order.createdAt), "dd/MM/yyyy HH:mm")}
                   </TableCell>
                 </TableRow>
               ))}
@@ -117,10 +112,10 @@ export default async function AdminBookingsPage() {
         </CardContent>
       </Card>
 
-      {bookings.length === 0 && (
+      {orders.length === 0 && (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">No bookings yet</p>
+            <p className="text-muted-foreground">No orders yet</p>
           </CardContent>
         </Card>
       )}

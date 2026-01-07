@@ -1,27 +1,23 @@
-import { auth } from "@/auth";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { Icon } from "@iconify/react";
-import { getVenues } from "@/lib/actions/venue";
-import { DataTable } from "@/components/data-table";
-import { columns } from "./columns";
-import { getCourts } from "@/lib/data/court";
+import { getCourts } from "@/lib/actions/court";
+import { hasPermission } from "@/lib/auth-helpers";
+import AddForm from "./add-form";
+import {
+  getCourtType,
+  getFloorTypes,
+  getVenuesAsSelect,
+} from "@/lib/actions/select";
+import { Table } from "lucide-react";
+import { TableClient } from "./table-client";
 
 export default async function AdminVenuesPage() {
-  const session = await auth();
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  if (
-    session.user.role !== "SUPER_ADMIN" &&
-    session.user.role !== "VENUE_ADMIN"
-  ) {
-    redirect("/");
-  }
+  await hasPermission("courts.view");
 
   const result = await getCourts();
+  console.log(result.data);
+
+  const venues = await getVenuesAsSelect({ searchParams: "" });
+  const courtTypes = await getCourtType();
+  const floorTypes = await getFloorTypes();
 
   return (
     <div className='flex flex-1 flex-col p-4 pt-0 font-sans'>
@@ -33,25 +29,19 @@ export default async function AdminVenuesPage() {
           </div>
         </div>
         <div className='flex items-center gap-2.5'>
-          <Link
-            href='/admin/venues/add'
-            className='bg-white border border-muted-foreground rounded-md px-4 py-2 inline-flex justify-center items-center gap-2 text-sm font-medium text-muted-foreground cursor-pointer hover:bg-black hover:text-white transition-colors'>
-            <Icon icon='heroicons:plus-16-solid' className='size-4' />
-            Tambah Data
-          </Link>
+          <AddForm
+            venues={venues}
+            courtType={courtTypes}
+            floorType={floorTypes}
+          />
         </div>
       </div>
 
       {result.success ? (
-        <DataTable
-          columns={columns}
-          data={result.data}
-          searchKey='name'
-          searchPlaceholder='Cari venue...'
-        />
+        <TableClient data={result.data} />
       ) : (
         <div className='bg-sidebar-accent min-h-72 rounded-md flex items-center justify-center'>
-          <p className='text-muted-foreground'>{result.message}</p>
+          <p className='text-muted-foreground'>No data available</p>
         </div>
       )}
     </div>

@@ -3,43 +3,70 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const permissions = [
-  { code: "venue.create", name: "Create Venue", group: "venue" },
-  { code: "venue.edit", name: "Edit Venue", group: "venue" },
-  { code: "venue.delete", name: "Delete Venue", group: "venue" },
-  { code: "venue.view", name: "View Venue", group: "venue" },
-  { code: "venue.view_all", name: "View All Venues", group: "venue" },
+  { code: "admin.access", name: "Access Admin Panel", group: "admin" },
 
-  { code: "court.create", name: "Create Court", group: "court" },
-  { code: "court.edit", name: "Edit Court", group: "court" },
-  { code: "court.delete", name: "Delete Court", group: "court" },
-  { code: "court.view", name: "View Court", group: "court" },
+  { code: "venues.create", name: "Create Venue", group: "venues" },
+  { code: "venues.update", name: "Edit Venue", group: "venues" },
+  { code: "venues.delete", name: "Delete Venue", group: "venues" },
+  { code: "venues.view", name: "View Venue", group: "venues" },
+  { code: "venues.view_all", name: "View All Venues", group: "venues" },
 
-  { code: "booking.view", name: "View Booking", group: "booking" },
-  { code: "booking.create", name: "Create Booking", group: "booking" },
-  { code: "booking.confirm", name: "Confirm Booking", group: "booking" },
-  { code: "booking.cancel", name: "Cancel Booking", group: "booking" },
-  { code: "booking.complete", name: "Complete Booking", group: "booking" },
+  { code: "courts.create", name: "Create Court", group: "courts" },
+  { code: "courts.update", name: "Edit Court", group: "courts" },
+  { code: "courts.delete", name: "Delete Court", group: "courts" },
+  { code: "courts.view", name: "View Court", group: "courts" },
 
-  { code: "user.view", name: "View Users", group: "user" },
-  { code: "user.create", name: "Create User", group: "user" },
-  { code: "user.edit", name: "Edit User", group: "user" },
-  { code: "user.delete", name: "Delete User", group: "user" },
-  { code: "user.manage_roles", name: "Manage User Roles", group: "user" },
+  { code: "bookings.view", name: "View Booking", group: "bookings" },
+  { code: "bookings.create", name: "Create Booking", group: "bookings" },
+  { code: "bookings.confirm", name: "Confirm Booking", group: "bookings" },
+  { code: "bookings.cancel", name: "Cancel Booking", group: "bookings" },
+  { code: "bookings.complete", name: "Complete Booking", group: "bookings" },
 
-  { code: "role.view", name: "View Roles", group: "role" },
-  { code: "role.create", name: "Create Role", group: "role" },
-  { code: "role.edit", name: "Edit Role", group: "role" },
-  { code: "role.delete", name: "Delete Role", group: "role" },
+  { code: "users.view", name: "View Users", group: "users" },
+  { code: "users.create", name: "Create User", group: "users" },
+  { code: "users.update", name: "Edit User", group: "users" },
+  { code: "users.delete", name: "Delete User", group: "users" },
+  { code: "users.manage_roles", name: "Manage User Roles", group: "users" },
 
-  { code: "admin_request.view", name: "View Admin Requests", group: "admin_request" },
-  { code: "admin_request.approve", name: "Approve Admin Request", group: "admin_request" },
-  { code: "admin_request.reject", name: "Reject Admin Request", group: "admin_request" },
+  { code: "roles.view", name: "View Roles", group: "roles" },
+  { code: "roles.create", name: "Create Role", group: "roles" },
+  { code: "roles.update", name: "Edit Role", group: "roles" },
+  { code: "roles.delete", name: "Delete Role", group: "roles" },
 
-  { code: "report.view", name: "View Reports", group: "report" },
-  { code: "report.export", name: "Export Reports", group: "report" },
+  { code: "permissions.view", name: "View permissions", group: "permissions" },
+  {
+    code: "permissions.create",
+    name: "Create Permission",
+    group: "permissions",
+  },
+  { code: "permissions.update", name: "Edit Permission", group: "permissions" },
+  {
+    code: "permissions.delete",
+    name: "Delete Permission",
+    group: "permissions",
+  },
+
+  {
+    code: "admin_requests.view",
+    name: "View Admin Requests",
+    group: "admin_requests",
+  },
+  {
+    code: "admin_requests.approve",
+    name: "Approve Admin Request",
+    group: "admin_requests",
+  },
+  {
+    code: "admin_requests.reject",
+    name: "Reject Admin Request",
+    group: "admin_requests",
+  },
+
+  { code: "reports.view", name: "View Reports", group: "reports" },
+  { code: "reports.export", name: "Export Reports", group: "reports" },
 
   { code: "settings.view", name: "View Settings", group: "settings" },
-  { code: "settings.edit", name: "Edit Settings", group: "settings" },
+  { code: "settings.update", name: "Edit Settings", group: "settings" },
 ];
 
 const roles = [
@@ -54,21 +81,22 @@ const roles = [
     description: "Manage own venue, courts, bookings, and staff",
     isSystem: true,
     permissions: [
-      "venue.edit",
-      "venue.view",
-      "court.create",
-      "court.edit",
-      "court.delete",
-      "court.view",
-      "booking.view",
-      "booking.confirm",
-      "booking.cancel",
-      "booking.complete",
-      "user.view",
-      "user.create",
-      "user.edit",
-      "report.view",
-      "report.export",
+      "admin.access",
+      "venues.update",
+      "venues.view",
+      "courts.create",
+      "courts.update",
+      "courts.delete",
+      "courts.view",
+      "bookings.view",
+      "bookings.confirm",
+      "bookings.cancel",
+      "bookings.complete",
+      "users.view",
+      "users.create",
+      "users.update",
+      "reports.view",
+      "reports.export",
     ],
   },
   {
@@ -76,31 +104,30 @@ const roles = [
     description: "Handle bookings and payments",
     isSystem: true,
     permissions: [
-      "venue.view",
-      "court.view",
-      "booking.view",
-      "booking.create",
-      "booking.confirm",
-      "booking.cancel",
-      "booking.complete",
+      "admin.access",
+      "venues.view",
+      "courts.view",
+      "bookings.view",
+      "bookings.create",
+      "bookings.confirm",
+      "bookings.cancel",
+      "bookings.complete",
     ],
   },
   {
     name: "User",
     description: "Regular user who can make bookings",
     isSystem: true,
-    permissions: [
-      "venue.view",
-      "court.view",
-      "booking.view",
-      "booking.create",
-      "booking.cancel",
-    ],
+    permissions: [],
   },
 ];
 
 async function main() {
   console.log("🌱 Seeding roles and permissions...");
+
+  console.log("🗑️ Clearing old data...");
+  await prisma.rolePermission.deleteMany();
+  await prisma.permission.deleteMany();
 
   console.log("📝 Creating permissions...");
   for (const permission of permissions) {
@@ -139,7 +166,9 @@ async function main() {
       });
     }
 
-    console.log(`✅ Created role "${role.name}" with ${permissionCodes.length} permissions`);
+    console.log(
+      `✅ Created role "${role.name}" with ${permissionCodes.length} permissions`
+    );
   }
 
   console.log("🎉 Roles and permissions seeding completed!");

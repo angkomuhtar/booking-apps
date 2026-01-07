@@ -21,8 +21,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 import CartList from "./cartList";
+import { Button } from "./ui/button";
 
 const AppNav = async () => {
   const session = await auth();
@@ -83,9 +84,8 @@ const AppNav = async () => {
                 <DropdownMenuContent side='top' sideOffset={10} align='end'>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      Billing
-                      <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                    <DropdownMenuItem asChild className='cursor-pointer'>
+                      <Link href='/orders'>My Orders</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       Settings
@@ -98,16 +98,23 @@ const AppNav = async () => {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    {session.user?.role != "USER" && (
+                    {session.user?.role != "User" && (
                       <DropdownMenuItem asChild className='cursor-pointer'>
                         <Link href='/admin'>Admin Page</Link>
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Log out
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                  <DropdownMenuItem asChild className='cursor-pointer'>
+                    <button
+                      className='w-full'
+                      onClick={async () => {
+                        "use server";
+                        await signOut();
+                      }}>
+                      Log out
+                      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                    </button>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -24,7 +24,10 @@ export type VenueColumn = {
   city: { name: string } | null;
   province: { name: string } | null;
   venueFacilities: { facility: { name: string } }[];
+  openingTime: string;
+  closingTime: string;
   createdAt: Date;
+  courts: { id: string; name: string }[];
 };
 
 export const columns: ColumnDef<VenueColumn>[] = [
@@ -54,7 +57,7 @@ export const columns: ColumnDef<VenueColumn>[] = [
     id: "courts",
     header: "Lapangan",
     cell: ({ row }) => {
-      return `${row.original.venueFacilities.length} Lapangan`;
+      return `${row.original.courts.length} Lapangan`;
     },
   },
   {
@@ -62,6 +65,12 @@ export const columns: ColumnDef<VenueColumn>[] = [
     header: "Fasilitas",
     cell: ({ row }) => {
       return `${row.original.venueFacilities.length} fasilitas`;
+    },
+  },
+  {
+    header: "Jam Operasional",
+    cell: ({ row }) => {
+      return row.original.openingTime + " - " + row.original.closingTime;
     },
   },
   {

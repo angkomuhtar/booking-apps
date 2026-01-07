@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth-helpers";
+import { getAccessibleVenueIds, requireAuth } from "@/lib/auth-helpers";
 import {
   createVenueSchema,
   updateVenueSchema,
@@ -259,12 +259,16 @@ export async function getFacilities() {
 
 export async function getVenues() {
   try {
-    await requireAuth();
+    const venueslist = await getAccessibleVenueIds();
 
     const venues = await prisma.venue.findMany({
+      where: {
+        ...(venueslist.allAccess ? {} : { id: { in: venueslist.venueIds } }),
+      },
       include: {
         city: true,
         province: true,
+        courts: true,
         venueFacilities: {
           include: {
             facility: true,
@@ -278,5 +282,45 @@ export async function getVenues() {
   } catch (error) {
     console.error("Get venues error:", error);
     return { success: false, data: [], message: "Gagal mengambil data venues" };
+  }
+}
+
+export async function getVenueById(venueId: string) {
+  try {
+    const venue = await prisma.venue.findUnique({
+      where: { id: venueId },
+      include: {
+        city: true,
+        province: true,
+        venueImages: {
+          orderBy: { order: "asc" },
+        },
+        venueFacilities: {
+          include: {
+            facility: true,
+          },
+        },
+        courts: {
+          include: {
+            courtType: true,
+            floorType: true,
+            pricing: true,
+          },
+        },
+      },
+    });
+
+    if (!venue) {
+      return { success: false, data: null, message: "Venue tidak ditemukan" };
+    }
+
+    return { success: true, data: venue };
+  } catch (error) {
+    console.error("Get venue by id error:", error);
+    return {
+      success: false,
+      data: null,
+      message: "Gagal mengambil data venue",
+    };
   }
 }

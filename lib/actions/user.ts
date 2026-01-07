@@ -14,7 +14,7 @@ export async function getUsers() {
       createdAt: true,
       _count: {
         select: {
-          bookings: true,
+          orders: true,
           venueAccess: true,
         },
       },
@@ -66,35 +66,37 @@ export async function getUserProfile(id: string) {
       phone: true,
       role: true,
       createdAt: true,
-      bookings: {
+      orders: {
         select: {
           id: true,
-          date: true,
-          startTime: true,
-          endTime: true,
+          orderNumber: true,
           totalPrice: true,
           status: true,
-          court: {
+          createdAt: true,
+          venue: {
             select: {
               id: true,
               name: true,
-              type: true,
-              venue: {
-                select: {
-                  id: true,
-                  name: true,
-                  city: true,
-                },
-              },
+              city: true,
+            },
+          },
+          items: {
+            where: { itemType: "COURT_BOOKING" },
+            select: {
+              id: true,
+              name: true,
+              date: true,
+              startTime: true,
+              endTime: true,
             },
           },
         },
-        orderBy: { date: "desc" },
+        orderBy: { createdAt: "desc" },
         take: 10,
       },
       _count: {
         select: {
-          bookings: true,
+          orders: true,
         },
       },
     },
