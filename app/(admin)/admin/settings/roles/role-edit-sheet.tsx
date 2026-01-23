@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { RoleColumn } from "./columns";
 import { Badge } from "@/components/ui/badge";
@@ -48,12 +47,13 @@ import {
   ItemContent,
   ItemTitle,
 } from "@/components/ui/item";
+import { Permission } from "@prisma/client";
 
 interface RoleEditSheetProps {
   role: RoleColumn | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  permissions: any[];
+  permissions: Permission[];
 }
 
 type SelectedPermission = {
@@ -105,9 +105,9 @@ export function RoleEditSheet({
 
   useEffect(() => {
     form.setValue("permissions", selectedPermissions);
-  }, [selectedPermissions]);
+  }, [selectedPermissions, form]);
 
-  const togglePermission = (permission: any) => {
+  const togglePermission = (permission: Permission) => {
     const isSelected = selectedPermissions.some(
       (p) => p.permissionId === permission.id
     );
@@ -190,7 +190,7 @@ export function RoleEditSheet({
               <FormField
                 control={form.control}
                 name='isSystem'
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Role Permission</FormLabel>
                     <div className='flex gap-2 flex-wrap rounded-md border border-input shadow-xs p-3 min-h-20'>

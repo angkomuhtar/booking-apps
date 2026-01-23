@@ -9,6 +9,7 @@ import {
 import { CourtSchema } from "@/schema/courts.schema";
 import z from "zod";
 import { revalidatePath } from "next/cache";
+import { uploadToR2 } from "../r2";
 
 export async function getCourts() {
   const venues = await getAccessibleVenueIds();
@@ -57,6 +58,23 @@ export async function createCourt(data: z.infer<typeof CourtSchema>) {
 
     const validatedData = CourtSchema.parse(data);
 
+    const uploadedUrls = await Promise.all(
+      data.images.map(async (img, index) => {
+        const buffer = Buffer.from(await img.file.arrayBuffer());
+        const url = await uploadToR2(
+          buffer,
+          img.file.name,
+          img.file.type,
+          "venues",
+        );
+        return {
+          url: url,
+          order: index,
+          isPrimary: img.isPrimary || index === 0,
+        };
+      }),
+    );
+
     const court = await prisma.court.create({
       data: {
         name: validatedData.name,
@@ -66,6 +84,15 @@ export async function createCourt(data: z.infer<typeof CourtSchema>) {
         sessionDuration: validatedData.sessionDuration,
         venueId: validatedData.venueId,
         isActive: validatedData.isActive,
+        courtImages: {
+          createMany: {
+            data: uploadedUrls.map((img) => ({
+              imageUrl: img.url,
+              order: img.order,
+              isPrimary: img.isPrimary,
+            })),
+          },
+        },
       },
     });
 
@@ -93,7 +120,7 @@ export async function createCourt(data: z.infer<typeof CourtSchema>) {
 
 export async function updateCourt(
   courtId: string,
-  data: z.infer<typeof CourtSchema>
+  data: z.infer<typeof CourtSchema>,
 ) {
   try {
     const court = await prisma.court.findUnique({
@@ -361,7 +388,7 @@ export async function getCourtWithBookings(courtId: string, date: Date) {
       },
       order: {
         status: {
-          in: ["PENDING", "PAID", "PROCESSING"],
+          in: ["WAIT_PAYMENT", "PAID", "PROCESSING"],
         },
       },
     },

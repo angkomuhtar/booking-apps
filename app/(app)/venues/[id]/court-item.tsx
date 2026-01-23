@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useCartStore } from "@/store/useCartStore";
+import { isBefore } from "date-fns";
 import React from "react";
 import { toast } from "sonner";
 
@@ -33,7 +34,20 @@ interface Court {
     price: number;
     discount: number;
   }[];
+  courtImages: {
+    id: string;
+    imageUrl: string;
+    order: number;
+    isPrimary: boolean;
+  }[];
 }
+
+interface BookedSlot {
+  itemId: string;
+  startTime: string | null;
+  endTime: string | null;
+}
+
 const CourtItem = ({
   item,
   venueId,
@@ -41,6 +55,7 @@ const CourtItem = ({
   selectedDate,
   startTime,
   endTime,
+  bookedSlots = [],
 }: {
   item: Court;
   venueId: string;
@@ -48,6 +63,7 @@ const CourtItem = ({
   selectedDate: string;
   startTime?: string;
   endTime?: string;
+  bookedSlots?: BookedSlot[];
 }) => {
   const { addItem, items } = useCartStore();
   const timeToMinutes = (time: string) => {
@@ -89,15 +105,31 @@ const CourtItem = ({
     <div className='grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 items-start mb-4 border-b pb-6'>
       <Carousel className='w-full'>
         <CarouselContent>
-          <CarouselItem>
-            <div className='p-1'>
-              <img
-                src='/image/venue-6.jpg'
-                alt={item.name}
-                className='w-full rounded-md aspect-video object-cover'
-              />
-            </div>
-          </CarouselItem>
+          {item.courtImages.length > 0 ? (
+            item.courtImages
+              .sort((a, b) => a.order - b.order)
+              .map((img) => (
+                <CarouselItem key={img.id}>
+                  <div className='p-1'>
+                    <img
+                      src={img.imageUrl}
+                      alt={item.name}
+                      className='w-full rounded-md aspect-video object-cover'
+                    />
+                  </div>
+                </CarouselItem>
+              ))
+          ) : (
+            <CarouselItem>
+              <div className='p-1'>
+                <img
+                  src='/image/venue-6.jpg'
+                  alt={item.name}
+                  className='w-full rounded-md aspect-video object-cover'
+                />
+              </div>
+            </CarouselItem>
+          )}
         </CarouselContent>
         <CarouselPrevious className='left-1 p-1 cursor-pointer hover:bg-gray-200 rounded-md' />
         <CarouselNext className='right-1 p-1 cursor-pointer hover:bg-gray-200 rounded-md' />
@@ -109,11 +141,7 @@ const CourtItem = ({
           {", "}
           {item.floorType?.name || "Standard Court"}
         </span>
-        <Accordion
-          type='single'
-          collapsible
-          className='w-full'
-          defaultValue={`item-${item.id}`}>
+        <Accordion type='single' collapsible className='w-full'>
           <AccordionItem value={`item-${item.id}`}>
             <AccordionTrigger className='cursor-pointer'>
               Jadwal Lapangan
@@ -121,12 +149,29 @@ const CourtItem = ({
             <AccordionContent className='grid gap-4 grid-cols-2 md:grid-cols-5 py-2'>
               {generateTimeSlots(item).map((slot) => {
                 const isInCart = items.some(
-                  (cartItem) => cartItem.id === slot.id
+                  (cartItem) => cartItem.id === slot.id,
                 );
+                const isBooked = bookedSlots.some(
+                  (b) =>
+                    b.startTime === slot.startTime &&
+                    b.endTime === slot.endTime,
+                );
+                const isExpired = isBefore(
+                  new Date(`${selectedDate}T${slot.startTime}`),
+                  new Date(),
+                );
+
+                console.log(
+                  "SLOTT",
+                  new Date(`${selectedDate}T${slot.startTime}`),
+                  isExpired,
+                );
+
+                const isDisabled = isInCart || isBooked || isExpired;
                 return (
                   <button
-                    disabled={isInCart}
-                    onClick={(e) => {
+                    disabled={isDisabled}
+                    onClick={() => {
                       addItem({
                         id: slot.id,
                         itemType: "COURT_BOOKING",
@@ -145,7 +190,7 @@ const CourtItem = ({
                     }}
                     key={slot.id}
                     className={`text-center rounded-md border p-2 cursor-pointer  ${
-                      isInCart
+                      isDisabled
                         ? "opacity-50 cursor-not-allowed"
                         : " hover:bg-primary/10"
                     }`}>
@@ -161,6 +206,11 @@ const CourtItem = ({
                         {slot.price.toLocaleString("id-ID")}
                       </span>
                     </span>
+                    {isBooked && (
+                      <p className='text-xs text-red-500 font-medium'>
+                        Terpesan
+                      </p>
+                    )}
                   </button>
                 );
               })}

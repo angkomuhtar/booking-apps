@@ -1,9 +1,17 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireAuth, requireVenueAccess } from "@/lib/auth-helpers";
+import {
+  canAccessVenue,
+  getAccessibleVenueIds,
+  requireAuth,
+  requirePermission,
+  requireVenueAccess,
+} from "@/lib/auth-helpers";
 import { OrderStatus, OrderItemType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { checkItemsAvailability } from "../status_helpers";
+import { snap } from "../midtrans";
 
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -37,9 +45,21 @@ export async function createOrder(input: CreateOrderInput) {
       return { success: false, message: "Keranjang kosong" };
     }
 
+    const availability = await checkItemsAvailability(input.items);
+    if (!availability.available) {
+      const reasons = availability.unavailableItems
+        .map((item) => `${item.name}: ${item.reason}`)
+        .join(", ");
+      return {
+        success: false,
+        message: `Beberapa item tidak tersedia: ${reasons}`,
+        unavailableItems: availability.unavailableItems,
+      };
+    }
+
     const subtotal = input.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
-      0
+      0,
     );
 
     const order = await prisma.order.create({
@@ -50,7 +70,7 @@ export async function createOrder(input: CreateOrderInput) {
         subtotal,
         discount: 0,
         totalPrice: subtotal,
-        status: "PENDING",
+        status: "WAIT_PAYMENT",
         notes: input.notes,
         items: {
           create: input.items.map((item) => ({
@@ -68,6 +88,42 @@ export async function createOrder(input: CreateOrderInput) {
       },
       include: {
         items: true,
+      },
+    });
+
+    const parameter = {
+      transaction_details: {
+        order_id: order.orderNumber,
+        gross_amount: order.totalPrice,
+      },
+      item_details: order.items.map((item) => ({
+        id: item.id,
+        price: item.price,
+        quantity: item.quantity,
+        name: item.name.substring(0, 50),
+      })),
+      expiry: {
+        unit: "minutes",
+        duration: 10,
+      },
+      customer_details: {
+        first_name: session.user.name || "Customer",
+        email: session.user.email || undefined,
+      },
+      callbacks: {
+        finish: `${process.env.NEXTAUTH_URL}/orders`,
+      },
+    };
+
+    const transaction = await snap.createTransaction(parameter);
+
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        payment_url: transaction.redirect_url,
+        snap_token: transaction.token,
+        status: "WAIT_PAYMENT",
+        payment_expireAt: new Date(Date.now() + 10 * 60 * 1000), // 30 minutes from now
       },
     });
 
@@ -92,96 +148,116 @@ export async function createOrder(input: CreateOrderInput) {
 }
 
 export async function getOrders() {
-  return await prisma.order.findMany({
-    select: {
-      id: true,
-      orderNumber: true,
-      totalPrice: true,
-      status: true,
-      createdAt: true,
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
+  try {
+    const venues = await getAccessibleVenueIds();
+    await requirePermission("orders.view");
+    const data = await prisma.order.findMany({
+      where: {
+        ...(venues.allAccess ? {} : { venueId: { in: venues.venueIds } }),
+        status: { not: "CANCELLED" },
+      },
+      select: {
+        id: true,
+        orderNumber: true,
+        totalPrice: true,
+        status: true,
+        notes: true,
+        createdAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        venue: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        items: {
+          select: {
+            id: true,
+            itemType: true,
+            name: true,
+            price: true,
+            quantity: true,
+            date: true,
+            startTime: true,
+            endTime: true,
+          },
         },
       },
-      venue: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      items: {
-        select: {
-          id: true,
-          itemType: true,
-          name: true,
-          price: true,
-          quantity: true,
-          date: true,
-          startTime: true,
-          endTime: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+    });
+
+    return { success: true, data: data };
+  } catch (error) {
+    console.error("Get orders error:", error);
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "Gagal mengambil data orders" };
+  }
 }
 
 export async function getOrderById(id: string) {
-  const order = await prisma.order.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      orderNumber: true,
-      subtotal: true,
-      discount: true,
-      totalPrice: true,
-      status: true,
-      paymentMethod: true,
-      paymentProof: true,
-      notes: true,
-      paidAt: true,
-      createdAt: true,
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
+  try {
+    await getAccessibleVenueIds();
+    await requirePermission("orders.view");
+    const data = await prisma.order.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        orderNumber: true,
+        totalPrice: true,
+        status: true,
+        notes: true,
+        createdAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        venue: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        items: {
+          select: {
+            id: true,
+            itemType: true,
+            name: true,
+            price: true,
+            quantity: true,
+            date: true,
+            startTime: true,
+            endTime: true,
+          },
         },
       },
-      venue: {
-        select: {
-          id: true,
-          name: true,
-          address: true,
-          city: true,
-        },
-      },
-      items: {
-        select: {
-          id: true,
-          itemType: true,
-          itemId: true,
-          name: true,
-          price: true,
-          quantity: true,
-          date: true,
-          startTime: true,
-          endTime: true,
-          duration: true,
-        },
-      },
-    },
-  });
+    });
 
-  if (!order) {
-    throw new Error("Order not found");
+    if (data) {
+      await canAccessVenue(data.venue.id);
+      return { success: true, data };
+    } else {
+      return { success: false, message: "Order not found" };
+    }
+  } catch (error) {
+    console.error("Get orders error:", error);
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "Gagal mengambil data orders" };
   }
-
-  return order;
 }
 
 export async function getUserOrders(userId: string) {
@@ -297,10 +373,6 @@ export async function getOrdersByStatus(status: OrderStatus) {
   });
 }
 
-export async function getPendingOrders() {
-  return getOrdersByStatus("PENDING");
-}
-
 export async function getUpcomingCourtBookings(userId: string) {
   const session = await requireAuth();
 
@@ -315,7 +387,7 @@ export async function getUpcomingCourtBookings(userId: string) {
     where: {
       userId,
       status: {
-        in: ["PENDING", "PAID", "PROCESSING"],
+        in: ["WAIT_PAYMENT", "PAID", "PROCESSING"],
       },
       items: {
         some: {
@@ -373,7 +445,7 @@ export async function getOrderStats(venueId?: string) {
   const [total, pending, paid, processing, completed, cancelled] =
     await Promise.all([
       prisma.order.count({ where: whereClause }),
-      prisma.order.count({ where: { ...whereClause, status: "PENDING" } }),
+      prisma.order.count({ where: { ...whereClause, status: "WAIT_PAYMENT" } }),
       prisma.order.count({ where: { ...whereClause, status: "PAID" } }),
       prisma.order.count({ where: { ...whereClause, status: "PROCESSING" } }),
       prisma.order.count({ where: { ...whereClause, status: "COMPLETED" } }),
@@ -407,7 +479,7 @@ export async function getCourtBookingsForDate(courtId: string, date: Date) {
       },
       order: {
         status: {
-          in: ["PENDING", "PAID", "PROCESSING", "COMPLETED"],
+          in: ["WAIT_PAYMENT", "PAID", "PROCESSING", "COMPLETED"],
         },
       },
     },

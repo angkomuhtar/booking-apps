@@ -8,4 +8,17 @@ export const CourtSchema = z.object({
   sessionDuration: z.number().min(15, "Minimal 15 menit"),
   isActive: z.boolean().optional(),
   venueId: z.string().min(2, "Venue harus dipilih"),
+  images: z
+    .array(
+      z.object({
+        file: z.any().optional(),
+        preview: z.string(),
+        name: z.string(),
+        url: z.string().optional(),
+        order: z.number().optional(),
+        isPrimary: z.boolean().optional(),
+      }),
+    )
+    .min(1, "Upload minimal 1 gambar")
+    .max(10, "Maksimal 10 gambar"),
 });

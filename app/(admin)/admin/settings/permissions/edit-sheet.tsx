@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PermissionSchema, RoleSchema } from "@/schema/roles.schema";
+import { PermissionSchema } from "@/schema/roles.schema";
 
 import {
   Sheet,
@@ -29,7 +29,6 @@ import { Button } from "@/components/ui/button";
 import { PermissionColumn } from "./columns";
 import { updatePermission } from "@/lib/actions/permission";
 import { toast } from "sonner";
-import { permission } from "process";
 
 interface EditSheetProps {
   data: PermissionColumn | null;
@@ -64,7 +63,7 @@ export function EditSheet({ data, open, onOpenChange }: EditSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className='inset-y-4 sm:right-4 rounded-md h-auto w-full max-w-lg gap-0'>
+      <SheetContent className='inset-y-4 sm:right-4 rounded-md h-auto w-full max-w-lg gap-0 '>
         <SheetHeader>
           <SheetTitle>Edit Role</SheetTitle>
           <SheetDescription></SheetDescription>

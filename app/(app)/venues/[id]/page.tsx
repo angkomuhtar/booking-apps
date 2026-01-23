@@ -6,7 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Dot, Home, MapPin, Star } from "lucide-react";
+import { Home, MapPin, Star } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Icon } from "@iconify/react";
@@ -14,7 +14,8 @@ import VenueReview from "@/components/venue-review";
 import { notFound } from "next/navigation";
 import VenueCourtSection from "./venue-court-section";
 import ContentEditor from "@/components/tiptap-templates/simple/editor-content";
-import { getVenueById } from "@/lib/data/users/venue";
+import { getVenueById } from "@/lib/data/venue";
+import ProductSelection from "./product-selection";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -265,6 +266,8 @@ const Page = async ({ params }: PageProps) => {
         startTime={venue.openingTime}
         endTime={venue.closingTime}
       />
+
+      <ProductSelection venueId={venue.id} products={venue.products || []} />
     </main>
   );
 };

@@ -1,6 +1,6 @@
 // "use client";
 
-import { BadgeDollarSign, Menu, ShoppingCart, User2 } from "lucide-react";
+import { BadgeDollarSign, Menu, User2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import {
@@ -16,21 +16,15 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
 import { auth, signOut } from "@/auth";
 import CartList from "./cartList";
-import { Button } from "./ui/button";
 
 const AppNav = async () => {
   const session = await auth();
-
-  // const { items, removeItem, totalPrice, clearCart } = useCartStore();
-
-  const items: unknown[] = [];
 
   return (
     <header className='bg-white border-b sticky top-0 z-50 shadow-xs'>
@@ -53,7 +47,7 @@ const AppNav = async () => {
               All Venues
             </Link>
             <Link
-              href='/bookings'
+              href='/orders'
               className='hover:text-primary transition-colors'>
               My Bookings
             </Link>
@@ -87,14 +81,6 @@ const AppNav = async () => {
                     <DropdownMenuItem asChild className='cursor-pointer'>
                       <Link href='/orders'>My Orders</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Settings
-                      <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Keyboard shortcuts
-                      <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
@@ -105,16 +91,14 @@ const AppNav = async () => {
                     )}
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild className='cursor-pointer'>
-                    <button
-                      className='w-full'
-                      onClick={async () => {
-                        "use server";
-                        await signOut();
-                      }}>
-                      Log out
-                      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                    </button>
+                  <DropdownMenuItem
+                    className='cursor-pointer'
+                    onClick={async () => {
+                      "use server";
+                      await signOut();
+                    }}>
+                    Log out
+                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

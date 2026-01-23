@@ -55,15 +55,13 @@ export type ProductCard = {
 };
 
 const ProductCard = ({ data }: { data: ProductCard }) => {
-  console.log(data);
-
   return (
     <Link href={`/venues/${data.id}`}>
       <div className='bg-white rounded-lg shadow-md hover:shadow-xl cursor-pointer hover:scale-105 hover:-translate-y-1 transition-all duration-150'>
         <img
           src={data.venueImages[0]?.imageUrl || "/image/court.jpg"}
           alt='Venue 1'
-          className='w-full h-40 object-cover rounded-t-md'
+          className='w-full aspect-video object-cover rounded-t-md'
         />
         <div className='p-4'>
           <h3 className='font-semibold text-sm'>{data.name}</h3>
@@ -88,7 +86,7 @@ const ProductCard = ({ data }: { data: ProductCard }) => {
           </div>
 
           <div className='flex items-center my-2 gap-1'>
-            {data.courtTypes.slice(0, 3).map((courtType, index) => (
+            {data?.courtTypes?.slice(0, 3).map((courtType, index) => (
               <span
                 key={index}
                 className='font-bold text-[10px] bg-blue-500 text-white px-1 rounded-xs lowercase'>

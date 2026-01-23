@@ -35,9 +35,10 @@ export async function getPopularVenues() {
   });
 
   return venues.map((venue) => {
-    const lowestPrice = venue.courts.length > 0
-      ? Math.min(...venue.courts.map((court) => Number(court.pricePerHour)))
-      : null;
+    const lowestPrice =
+      venue.courts.length > 0
+        ? Math.min(...venue.courts.map((court) => Number(court.pricePerHour)))
+        : null;
 
     return {
       ...venue,
@@ -232,7 +233,7 @@ export async function getVenueStats(venueId: string) {
       prisma.order.count({
         where: {
           venueId,
-          status: "PENDING",
+          status: "WAIT_PAYMENT",
         },
       }),
     ]);

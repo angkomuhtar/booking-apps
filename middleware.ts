@@ -14,8 +14,8 @@ function getRequiredPermission(pathname: string): string | null {
     return `${subModule}.view`;
   }
 
-  const module = segments[1].replace(/-/g, "_");
-  return `${module}.view`;
+  const moduleName = segments[1].replace(/-/g, "_");
+  return `${moduleName}.view`;
 }
 
 export default auth((req) => {

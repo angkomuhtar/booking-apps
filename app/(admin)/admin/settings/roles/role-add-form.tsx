@@ -2,14 +2,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Form,
   FormControl,
   FormField,
@@ -27,10 +19,8 @@ import {
   Item,
   ItemActions,
   ItemContent,
-  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -52,6 +42,7 @@ import { RoleSchema } from "@/schema/roles.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
 import { CheckCheckIcon, Search } from "lucide-react";
+import { Permission } from "@prisma/client";
 import React, { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -63,12 +54,11 @@ type SelectedPermission = {
   name: string;
 };
 
-const RoleAddForm = ({ permissions }: { permissions: any[] }) => {
+const RoleAddForm = ({ permissions }: { permissions: Permission[] }) => {
   const [selectedPermissions, setSelectedPermissions] = useState<
     SelectedPermission[]
   >([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const filteredPermissions = useMemo(() => {
     if (!searchQuery) return permissions;
@@ -91,9 +81,9 @@ const RoleAddForm = ({ permissions }: { permissions: any[] }) => {
 
   useEffect(() => {
     form.setValue("permissions", selectedPermissions);
-  }, [selectedPermissions]);
+  }, [selectedPermissions, form]);
 
-  const togglePermission = (permission: any) => {
+  const togglePermission = (permission: Permission) => {
     const isSelected = selectedPermissions.some(
       (p) => p.permissionId === permission.id
     );
@@ -186,7 +176,7 @@ const RoleAddForm = ({ permissions }: { permissions: any[] }) => {
               <FormField
                 control={form.control}
                 name='isSystem'
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Role Permission</FormLabel>
                     <div className='flex gap-2 flex-wrap rounded-md border border-input shadow-xs p-3 min-h-20'>

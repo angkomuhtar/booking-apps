@@ -26,7 +26,7 @@ export function TableClient({ data }: PermissionsClientProps) {
         setDialogType("delete");
       },
     }),
-    []
+    [],
   );
 
   const columnsWithMeta = useMemo(() => columns, []);

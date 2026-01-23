@@ -16,8 +16,14 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { useCartStore } from "@/store/useCartStore";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CourtItem from "./court-item";
+
+interface BookedSlot {
+  itemId: string;
+  startTime: string | null;
+  endTime: string | null;
+}
 
 interface Court {
   id: string;
@@ -54,11 +60,27 @@ export default function VenueCourtSection({
   startTime,
   endTime,
 }: VenueCourtSectionProps) {
-  const { addItem } = useCartStore();
+  useCartStore();
 
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD")
   );
+  const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([]);
+
+  const fetchBookedSlots = useCallback(async () => {
+    const courtIds = courts.map((c) => c.id);
+    const res = await fetch(
+      `/api/venues/booked-slots?courtIds=${courtIds.join(",")}&date=${selectedDate}`
+    );
+    if (res.ok) {
+      const data = await res.json();
+      setBookedSlots(data);
+    }
+  }, [courts, selectedDate]);
+
+  useEffect(() => {
+    fetchBookedSlots();
+  }, [fetchBookedSlots]);
 
   if (courts.length === 0) {
     return null;
@@ -156,6 +178,7 @@ export default function VenueCourtSection({
             selectedDate={selectedDate}
             startTime={startTime}
             endTime={endTime}
+            bookedSlots={bookedSlots.filter((s) => s.itemId === court.id)}
           />
         ))}
     </section>

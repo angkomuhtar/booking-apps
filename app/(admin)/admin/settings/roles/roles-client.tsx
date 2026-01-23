@@ -5,10 +5,11 @@ import { DataTable } from "@/components/data-table";
 import { columns, RoleColumn, RoleTableMeta } from "./columns";
 import { RoleEditSheet } from "./role-edit-sheet";
 import { RoleDeleteDialog } from "./role-delete-dialog";
+import { Permission } from "@prisma/client";
 
 interface RolesClientProps {
   data: RoleColumn[];
-  permissions: any[];
+  permissions: Permission[];
 }
 
 export function RolesClient({ data, permissions }: RolesClientProps) {
@@ -36,7 +37,7 @@ export function RolesClient({ data, permissions }: RolesClientProps) {
       <DataTable
         columns={columnsWithMeta}
         data={data}
-        searchKey='name'
+        searchKeys={["name"]}
         searchPlaceholder='Cari role...'
         meta={meta}
       />

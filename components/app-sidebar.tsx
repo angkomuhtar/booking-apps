@@ -10,6 +10,7 @@ import {
   GalleryVerticalEnd,
   Computer,
   InspectionPanel,
+  FileBox,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -44,7 +45,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       },
       {
         title: "Cashier",
-        url: "/cashier",
+        url: "/admin/cashier",
         icon: Computer,
         roles: ["Super Admin", "Venue Admin", "Cashier"],
       },
@@ -61,8 +62,14 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         roles: ["Super Admin", "Venue Admin"],
       },
       {
+        title: "Products",
+        url: "/admin/products",
+        icon: FileBox,
+        roles: ["Super Admin", "Venue Admin"],
+      },
+      {
         title: "Bookings",
-        url: "/admin/bookings",
+        url: "/admin/orders",
         icon: Calendar,
         roles: ["Super Admin", "Venue Admin", "Cashier"],
       },

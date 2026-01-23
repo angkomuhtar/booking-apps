@@ -1,5 +1,3 @@
-import { group } from "console";
-import { permission } from "process";
 import * as z from "zod";
 
 export const RolePermissionSchema = z.object({

@@ -6,7 +6,6 @@ import {
   getFloorTypes,
   getVenuesAsSelect,
 } from "@/lib/actions/select";
-import { Table } from "lucide-react";
 import { TableClient } from "./table-client";
 
 export default async function AdminVenuesPage() {

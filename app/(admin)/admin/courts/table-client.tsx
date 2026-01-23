@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { DataTable } from "@/components/data-table";
 import { columns, CourtColumn, TableMeta } from "./columns";
-import { EditSheet } from "./edit-sheet";
 import { DeleteDialog } from "./delete-dialog";
 import { updateCourtStatus } from "@/lib/actions/court";
 import { toast } from "sonner";
@@ -37,7 +36,7 @@ export function TableClient({ data }: CourtsClientProps) {
       },
       onStatusChange: handleStatusChange,
     }),
-    []
+    [],
   );
 
   const columnsWithMeta = useMemo(() => columns, []);

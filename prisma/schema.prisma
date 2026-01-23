@@ -103,28 +103,32 @@ model Court {
   venue           Venue          @relation(fields: [venueId], references: [id], onDelete: Cascade)
   courtType       CourtType?     @relation(fields: [type], references: [id], onDelete: SetNull)
   floorType       FloorType?     @relation(fields: [floor], references: [id], onDelete: SetNull)
+  courtImages     CourtImage[]
 
   @@index([venueId])
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  userId        String
-  venueId       String
-  orderNumber   String      @unique
-  subtotal      Int
-  discount      Int         @default(0)
-  totalPrice    Int
-  status        OrderStatus @default(PENDING)
-  paymentMethod String?
-  paymentProof  String?
-  notes         String?
-  paidAt        DateTime?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  venue         Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
-  items         OrderItem[]
+  id               String      @id @default(cuid())
+  userId           String
+  venueId          String
+  orderNumber      String      @unique
+  subtotal         Int
+  discount         Int         @default(0)
+  totalPrice       Int
+  status           OrderStatus @default(CREATED)
+  paymentMethod    String?
+  paymentProof     String?
+  notes            String?
+  paidAt           DateTime?
+  payment_url      String?
+  snap_token       String?
+  payment_expireAt DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venue            Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  items            OrderItem[]
 
   @@index([userId])
   @@index([venueId])
@@ -260,6 +264,20 @@ model VenueImage {
   @@index([isPrimary])
 }
 
+model CourtImage {
+  id        String   @id @default(cuid())
+  courtId   String
+  imageUrl  String
+  order     Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  court     Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
+
+  @@index([courtId])
+  @@index([isPrimary])
+}
+
 model VenueReview {
   id                String             @id @default(cuid())
   venueId           String
@@ -336,7 +354,8 @@ enum DayType {
 }
 
 enum OrderStatus {
-  PENDING
+  CREATED
+  WAIT_PAYMENT
   PAID
   PROCESSING
   COMPLETED

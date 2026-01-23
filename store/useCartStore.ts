@@ -26,6 +26,7 @@ type CartState = {
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
+  getSubTotalPrice: (type: CartItemType) => number;
   getItemsByType: (type: CartItemType) => CartItem[];
 };
 
@@ -80,6 +81,10 @@ export const useCartStore = create<CartState>()(
           (sum, item) => sum + item.price * item.quantity,
           0
         );
+      },
+      getSubTotalPrice: (type) => {
+        const data = get().items.filter((item) => item.itemType === type);
+        return data.reduce((sum, item) => sum + item.price * item.quantity, 0);
       },
       getItemsByType: (type) => {
         const data = get().items.filter((item) => item.itemType === type);

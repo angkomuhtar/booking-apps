@@ -90,7 +90,7 @@ const VenueReview = ({
               <Carousel className='w-full md:w-2/3'>
                 <CarouselContent>
                   {data.venueReviewImages.map((image) => (
-                    <CarouselItem className='bg-black'>
+                    <CarouselItem key={image.id} className='bg-black'>
                       <img
                         src={image.imageUrl}
                         className='object-cover h-full'

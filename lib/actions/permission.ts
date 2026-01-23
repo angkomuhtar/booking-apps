@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission } from "@/lib/auth-helpers";
 import z from "zod";
-import { PermissionSchema, RoleSchema } from "@/schema/roles.schema";
+import { PermissionSchema } from "@/schema/roles.schema";
 
 export async function createPermission(data: z.infer<typeof PermissionSchema>) {
   try {
-    const session = await requireAuth();
+    await requireAuth();
     await requirePermission("permissions.create");
 
     const validatedData = PermissionSchema.parse(data);

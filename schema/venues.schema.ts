@@ -19,7 +19,7 @@ export const createVenueSchema = z.object({
   facilities: z.array(z.string()).min(1, "Pilih minimal 1 fasilitas"),
   images: z
     .array(imageInputSchema)
-    .min(2, "Upload minimal 2 gambar")
+    .min(1, "Upload minimal 1 gambar")
     .max(10, "Maksimal 10 gambar"),
   openingTime: z.string("Isi waktu buka venue"),
   closingTime: z.string("Isi waktu tutup venue"),
