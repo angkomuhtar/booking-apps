@@ -1,54 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireVenueAccess } from "@/lib/auth-helpers";
 
-export async function getPopularVenues() {
-  const venues = await prisma.venue.findMany({
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      address: true,
-      city: true,
-      province: true,
-      totalReviews: true,
-      rating: true,
-      venueImages: {
-        where: { isPrimary: true },
-        take: 1,
-      },
-      createdAt: true,
-      _count: {
-        select: { courts: true },
-      },
-      courts: {
-        where: { isActive: true },
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          courtType: true,
-          pricePerHour: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
 
-  return venues.map((venue) => {
-    const lowestPrice =
-      venue.courts.length > 0
-        ? Math.min(...venue.courts.map((court) => Number(court.pricePerHour)))
-        : null;
-
-    return {
-      ...venue,
-      lowestPrice,
-      courtTypes: [
-        ...new Set(venue.courts.map((court) => court.courtType?.name)),
-      ],
-    };
-  });
-}
 
 export async function getVenueById(id: string) {
   const venue = await prisma.venue.findUnique({

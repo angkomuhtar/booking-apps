@@ -40,7 +40,7 @@
 #### 1. Venue Detail & Booking Page
 
 - ✅ Create `/venues/[id]` page
-- [ ] Display venue information
+- ✅ Display venue information
 - [ ] Show available courts with pricing
 - [ ] Calendar component for date selection
 - [ ] Time slot selection
@@ -180,3 +180,8 @@ Track feature requests in GitHub Issues or add here:
 - 🟢 Low: Nice to have
 
 **Update this file as features are completed!**
+
+Should Be Clear
+
+- App Name, desc, App Colors and etc
+- which one must be a prior offline book or Online

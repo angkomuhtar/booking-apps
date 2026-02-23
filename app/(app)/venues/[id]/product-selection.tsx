@@ -9,8 +9,8 @@ type ProductType = {
   id: string;
   name: string;
   price: number;
-  imageUrl?: string;
-  description: string;
+  imageUrl?: string | null;
+  description?: string | null;
   stock: number;
 };
 
@@ -19,7 +19,7 @@ const ProductSelection = ({
   products,
 }: {
   venueId: string;
-  products: any[];
+  products: ProductType[];
 }) => {
   const { addItem } = useCartStore();
 
@@ -41,7 +41,7 @@ const ProductSelection = ({
               <div className='mb-2 5'>
                 <div className='flex-col text-card-foreground rounded-xl border border-border black/5 flex items-center justify-center relative bg-accent/50 w-full aspect-4/3 mb-4 shadow-none'>
                   <img
-                    src={product.imageUrl}
+                    src={product?.imageUrl ?? "/image/product-placeholder.jpg"}
                     alt={product.name}
                     className='shrink-0 h-full w-full cursor-pointer rounded-xl object-cover'
                   />
@@ -50,7 +50,7 @@ const ProductSelection = ({
                   {product.name}
                 </h4>
                 <p className='text-[11px] text-muted-foreground px-1.5 line-clamp-2'>
-                  {product.description}
+                  {product.description ?? ""}
                 </p>
               </div>
               <div className='flex items-center justify-between px-2.5'>

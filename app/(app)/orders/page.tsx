@@ -1,9 +1,5 @@
 import { auth } from "@/auth";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -18,7 +14,7 @@ import {
   AccordionTriggerCust,
 } from "@/components/ui/accordion";
 import { getOrders } from "@/lib/data/orders";
-import { getStatusColor } from "@/lib/status_helpers";
+import { getStatusColor } from "@/lib/utils";
 
 export default async function OrdersPage() {
   const session = await auth();

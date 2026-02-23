@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { forbidden, redirect } from "next/navigation";
 
 export async function getSession() {
   return await auth();
@@ -8,7 +9,8 @@ export async function getSession() {
 export async function requireAuth() {
   const session = await getSession();
   if (!session?.user) {
-    throw new Error("Unauthorized");
+    // throw new Error("Unauthorized");
+    return redirect("/login");
   }
   return session;
 }
@@ -50,52 +52,35 @@ export async function canAccessVenue(venueId: string) {
   return !!venueAccess;
 }
 
-// export async function getAccessibleVenues() {
-//   const session = await requireAuth();
-
-//   if (session.user.role === "Super Admin" || session.user.accessAllVenues) {
-//     return await prisma.venue.findMany({
-//       include: {
-//         courts: true,
-//         venueAccess: {
-//           include: {
-//             user: {
-//               select: {
-//                 id: true,
-//                 name: true,
-//                 email: true,
-//               },
-//             },
-//           },
-//         },
-//       },
-//     });
-//   }
-
-//   const venueAccessList = await prisma.venueAccess.findMany({
-//     where: { userId: session.user.id },
-//     include: {
-//       venue: {
-//         include: {
-//           courts: true,
-//           venueAccess: {
-//             include: {
-//               user: {
-//                 select: {
-//                   id: true,
-//                   name: true,
-//                   email: true,
-//                 },
-//               },
-//             },
-//           },
-//         },
-//       },
-//     },
-//   });
-
-//   return venueAccessList.map((va) => va.venue);
-// }
+export async function getAccessibleVenues() {
+  const session = await requireAuth();
+  if (session.user.accessAllVenues) {
+    const venues = await prisma.venue.findMany({
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+      },
+    });
+    return venues;
+  } else {
+    const venueAccessList = await prisma.venueAccess.findMany({
+      where: { userId: session.user.id },
+      include: {
+        venue: {
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            city: true,
+          },
+        },
+      },
+    });
+    return venueAccessList.map((va) => va.venue);
+  }
+}
 
 // get all venue ids that the user has access to
 export async function getAccessibleVenueIds() {
@@ -147,13 +132,13 @@ export async function hasPermission(permissionCode: string) {
   if (!user?.role) return false;
 
   return user.role.permissions.some(
-    (rp) => rp.permission.code === permissionCode
+    (rp) => rp.permission.code === permissionCode,
   );
 }
 
 export async function requirePermission(permissionCode: string) {
   const hasPerm = await hasPermission(permissionCode);
   if (!hasPerm) {
-    throw new Error(`Forbidden: Missing permission ${permissionCode}`);
+    return forbidden();
   }
 }

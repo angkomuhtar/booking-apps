@@ -10,7 +10,7 @@ import {
 } from "@/lib/auth-helpers";
 import { OrderStatus, OrderItemType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { checkItemsAvailability } from "../status_helpers";
+import { checkItemsAvailability } from "../utils";
 import { snap } from "../midtrans";
 
 function generateOrderNumber(): string {

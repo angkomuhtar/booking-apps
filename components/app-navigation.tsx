@@ -1,7 +1,8 @@
-// "use client";
+"use client";
 
 import { BadgeDollarSign, Menu, User2 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 import {
   DropdownMenu,
@@ -20,11 +21,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-import { auth, signOut } from "@/auth";
+import { signOut, useSession } from "next-auth/react";
 import CartList from "./cartList";
+import { cn } from "@/lib/utils";
 
-const AppNav = async () => {
-  const session = await auth();
+const AppNav = () => {
+  const { data: session } = useSession();
+  const pathname = usePathname();
 
   return (
     <header className='bg-white border-b sticky top-0 z-50 shadow-xs'>
@@ -93,9 +96,8 @@ const AppNav = async () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className='cursor-pointer'
-                    onClick={async () => {
-                      "use server";
-                      await signOut();
+                    onClick={() => {
+                      signOut({ callbackUrl: "/" });
                     }}>
                     Log out
                     <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

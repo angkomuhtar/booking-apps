@@ -91,7 +91,7 @@ model Venue {
 model Court {
   id              String         @id @default(cuid())
   name            String
-  type            String?
+  type            String? 
   floor           String?
   sessionDuration Int            @default(60)
   pricePerHour    Int
@@ -113,9 +113,16 @@ model Order {
   userId           String
   venueId          String
   orderNumber      String      @unique
+  orderSource      OrderSource @default(ONLINE)
+  customerName     String? // nama customer walk-in (jika userId null)
+  customerPhone    String? // phone walk-in customer
+  cashierId        String? // user ID kasir yang memproses
   subtotal         Int
   discount         Int         @default(0)
   totalPrice       Int
+  dpAmount         Int? // jumlah DP yang dibayar
+  dpPaidAt         DateTime? // waktu bayar DP
+  remainingAmount  Int? // sisa yang harus dibayar
   status           OrderStatus @default(CREATED)
   paymentMethod    String?
   paymentProof     String?
@@ -133,6 +140,17 @@ model Order {
   @@index([userId])
   @@index([venueId])
   @@index([status])
+}
+
+enum OrderSource {
+  ONLINE
+  POS
+}
+
+enum PaymentStatus {
+  UNPAID
+  DP_PAID
+  FULLY_PAID
 }
 
 model OrderItem {

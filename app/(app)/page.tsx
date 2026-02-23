@@ -16,11 +16,10 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import ProductCard from "@/components/custom-ui/product-card";
 import { getPopularVenues } from "@/lib/data/venue";
+import { forbidden } from "next/navigation";
 
 export default async function Home() {
   const venues = await getPopularVenues();
-  console.log(venues);
-
   return (
     <>
       {/* header Banner */}

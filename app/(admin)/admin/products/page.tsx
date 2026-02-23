@@ -1,11 +1,11 @@
-import { hasPermission } from "@/lib/auth-helpers";
+import { hasPermission, requirePermission } from "@/lib/auth-helpers";
 import AddForm from "./add-form";
 import { getVenuesAsSelect } from "@/lib/actions/select";
 import { TableClient } from "./table-client";
 import { getProducts } from "@/lib/actions/products";
 
 export default async function AdminVenuesPage() {
-  await hasPermission("products.view");
+  await requirePermission("products.view");
 
   const result = await getProducts();
   console.log(result.data);

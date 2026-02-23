@@ -25,14 +25,14 @@ export async function createVenue(data: CreateVenueInput) {
           buffer,
           img.file.name,
           img.file.type,
-          "venues"
+          "venues",
         );
         return {
           url: url,
           order: index,
           isPrimary: img.isPrimary || index === 0,
         };
-      })
+      }),
     );
 
     const venue = await prisma.venue.create({
@@ -101,7 +101,7 @@ export async function createVenue(data: CreateVenueInput) {
 
 export async function updateVenue(
   venueId: string,
-  data: z.infer<typeof updateVenueSchema>
+  data: z.infer<typeof updateVenueSchema>,
 ) {
   try {
     const session = await requireAuth();
@@ -292,19 +292,23 @@ export async function getVenueById(venueId: string) {
       include: {
         city: true,
         province: true,
-        venueImages: {
-          orderBy: { order: "asc" },
-        },
-        venueFacilities: {
-          include: {
-            facility: true,
-          },
-        },
         courts: {
           include: {
             courtType: true,
             floorType: true,
             pricing: true,
+            courtImages: true,
+          },
+        },
+        products: {
+          where: { isActive: true },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            imageUrl: true,
+            price: true,
+            stock: true,
           },
         },
       },
@@ -316,7 +320,65 @@ export async function getVenueById(venueId: string) {
 
     return { success: true, data: venue };
   } catch (error) {
-    console.error("Get venue by id error:", error);
+    console.error("Get venue by ID error:", error);
+    return {
+      success: false,
+      data: null,
+      message: "Gagal mengambil data venue",
+    };
+  }
+}
+
+export async function getVenueProduct(venueId: string, query?: string) {
+  try {
+    const venue = await prisma.product.findMany({
+      where: {
+        venueId: venueId,
+        isActive: true,
+        ...(query ? { name: { contains: query, mode: "insensitive" } } : {}),
+      },
+    });
+
+    if (!venue) {
+      return { success: false, data: null, message: "Venue tidak ditemukan" };
+    }
+
+    return { success: true, data: venue };
+  } catch (error) {
+    console.error("Get venue by ID error:", error);
+    return {
+      success: false,
+      data: null,
+      message: "Gagal mengambil data venue",
+    };
+  }
+}
+
+export async function getVenueCourts(venueId: string) {
+  try {
+    const venue = await prisma.venue.findUnique({
+      where: { id: venueId },
+      include: {
+        city: true,
+        province: true,
+        courts: {
+          include: {
+            courtType: true,
+            floorType: true,
+            pricing: true,
+            courtImages: true,
+          },
+        },
+      },
+    });
+
+    if (!venue) {
+      return { success: false, data: null, message: "Venue tidak ditemukan" };
+    }
+
+    return { success: true, data: venue };
+  } catch (error) {
+    console.error("Get venue by ID error:", error);
     return {
       success: false,
       data: null,

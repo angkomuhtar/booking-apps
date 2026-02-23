@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: 10 * 1024 * 1024, // 4 MB
     },
+    authInterrupts: true,
   },
 };
 

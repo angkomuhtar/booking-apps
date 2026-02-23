@@ -37,18 +37,18 @@ interface EditSheetProps {
 
 export function EditSheet({ data, open, onOpenChange }: EditSheetProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const form = useForm<z.infer<typeof CourtSchema>>({
-    resolver: zodResolver(CourtSchema),
-    values: {
-      name: data?.name ?? "",
-      type: data?.type ?? "",
-      floor: data?.floor ?? "",
-      pricePerHour: data?.pricePerHour ?? 0,
-      sessionDuration: data?.sessionDuration ?? 60,
-      isActive: data?.isActive ?? true,
-      venueId: data?.venue?.id ?? "",
-    },
-  });
+  // const form = useForm<z.infer<typeof CourtSchema>>({
+  //   resolver: zodResolver(CourtSchema),
+  //   values: {
+  //     name: data?.name ?? "",
+  //     type: data?.type ?? "",
+  //     floor: data?.floor ?? "",
+  //     pricePerHour: data?.pricePerHour ?? 0,
+  //     sessionDuration: data?.sessionDuration ?? 60,
+  //     isActive: data?.isActive ?? true,
+  //     venueId: data?.venue?.id ?? "",
+  //   },
+  // });
 
   const onSubmit = async (formData: z.infer<typeof CourtSchema>) => {
     if (!data) return;
@@ -75,7 +75,7 @@ export function EditSheet({ data, open, onOpenChange }: EditSheetProps) {
           <SheetTitle>Edit Court</SheetTitle>
           <SheetDescription></SheetDescription>
         </SheetHeader>
-        <Form {...form}>
+        {/* <Form {...form}>
           <div className='overflow-auto [&::-webkit-scrollbar]:w-2'>
             <form
               id='court-edit-form'
@@ -146,7 +146,7 @@ export function EditSheet({ data, open, onOpenChange }: EditSheetProps) {
               {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
             </Button>
           </SheetFooter>
-        </Form>
+        </Form> */}
       </SheetContent>
     </Sheet>
   );

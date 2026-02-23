@@ -18,31 +18,12 @@ import {
 import { useCartStore } from "@/store/useCartStore";
 import { useState, useEffect, useCallback } from "react";
 import CourtItem from "./court-item";
+import { Court } from "@/types";
 
 interface BookedSlot {
   itemId: string;
   startTime: string | null;
   endTime: string | null;
-}
-
-interface Court {
-  id: string;
-  name: string;
-  type: string | null;
-  floor: string | null;
-  sessionDuration: number;
-  pricePerHour: number;
-  isActive: boolean;
-  courtType: { id: string; name: string } | null;
-  floorType: { id: string; name: string } | null;
-  pricing: {
-    id: string;
-    dayType: string;
-    startTime: string;
-    endTime: string;
-    price: number;
-    discount: number;
-  }[];
 }
 
 interface VenueCourtSectionProps {
@@ -63,14 +44,14 @@ export default function VenueCourtSection({
   useCartStore();
 
   const [selectedDate, setSelectedDate] = useState(
-    moment().format("YYYY-MM-DD")
+    moment().format("YYYY-MM-DD"),
   );
   const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([]);
 
   const fetchBookedSlots = useCallback(async () => {
     const courtIds = courts.map((c) => c.id);
     const res = await fetch(
-      `/api/venues/booked-slots?courtIds=${courtIds.join(",")}&date=${selectedDate}`
+      `/api/venues/booked-slots?courtIds=${courtIds.join(",")}&date=${selectedDate}`,
     );
     if (res.ok) {
       const data = await res.json();
@@ -106,7 +87,7 @@ export default function VenueCourtSection({
                 className='px-1 basis-1/3 md:basis-1/5 lg:basis-1/7'
                 onClick={() =>
                   setSelectedDate(
-                    moment().add(index, "days").format("YYYY-MM-DD")
+                    moment().add(index, "days").format("YYYY-MM-DD"),
                   )
                 }>
                 <div

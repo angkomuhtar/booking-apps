@@ -15,7 +15,7 @@ export const RoleSchema = z.object({
 
 export const PermissionSchema = z.object({
   name: z.string().min(4, "Nama permission minimal 5 karakter"),
-  code: z.string().min(4, "Kode permission minimal 5 karakter"),
-  group: z.string().min(4, "Group permission minimal 5 karakter"),
+  code: z.string().min(3, "Kode permission minimal 3 karakter"),
+  group: z.string().min(3, "Group permission minimal 3 karakter"),
   description: z.string().min(5, "Deskripsi minimal 5 karakter").optional(),
 });

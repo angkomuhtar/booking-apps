@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getOrderById } from "@/lib/actions/order";
-import { getStatusColor } from "@/lib/status_helpers";
+import { getStatusColor } from "@/lib/utils";
 import { format } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

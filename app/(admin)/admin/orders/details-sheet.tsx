@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { OrdersColumn } from "./columns";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getStatusColor } from "@/lib/status_helpers";
+import { getStatusColor } from "@/lib/utils";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 

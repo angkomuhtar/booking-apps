@@ -2,9 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Icon } from "@iconify/react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { meta } from "zod/v4/core";
 
 export type OrdersColumn = {
   user: {

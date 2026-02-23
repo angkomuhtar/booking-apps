@@ -2,20 +2,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-export default function NotFound() {
+export default function Forbidden() {
   return (
     <div className='flex min-h-screen flex-col items-center justify-center'>
-      <div className='relative w-sm lg:w-[500px] aspect-square'>
-        <Image
-          src='/image/404.svg'
-          alt='Not Found'
-          objectFit='contain'
-          fill
-          className='absolute object-contain'
-        />
-      </div>
+      <Image src='/image/403.svg' alt='Forbidden' width={300} height={300} />
       <p className='text-2xl text-muted-foreground max-w-sm text-center'>
-        Halaman tidak ditemukan
+        Maaf, Anda tidak memiliki izin untuk mengakses halaman ini.
       </p>
       <Button asChild className='mt-4 text-lg rounded-full font-bold'>
         <Link href='/'>Kembali ke Beranda</Link>

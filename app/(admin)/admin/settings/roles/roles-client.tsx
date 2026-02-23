@@ -27,7 +27,7 @@ export function RolesClient({ data, permissions }: RolesClientProps) {
         setDialogType("delete");
       },
     }),
-    []
+    [],
   );
 
   const columnsWithMeta = useMemo(() => columns, []);
@@ -37,7 +37,7 @@ export function RolesClient({ data, permissions }: RolesClientProps) {
       <DataTable
         columns={columnsWithMeta}
         data={data}
-        searchKeys={["name"]}
+        searchKey={"name"}
         searchPlaceholder='Cari role...'
         meta={meta}
       />

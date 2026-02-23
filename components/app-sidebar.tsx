@@ -44,8 +44,8 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         roles: ["Super Admin", "Venue Admin"],
       },
       {
-        title: "Cashier",
-        url: "/admin/cashier",
+        title: "P.O.S",
+        url: "/admin/pos",
         icon: Computer,
         roles: ["Super Admin", "Venue Admin", "Cashier"],
       },

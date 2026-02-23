@@ -58,6 +58,9 @@ const RoleAddForm = ({ permissions }: { permissions: Permission[] }) => {
   const [selectedPermissions, setSelectedPermissions] = useState<
     SelectedPermission[]
   >([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredPermissions = useMemo(() => {
@@ -65,7 +68,7 @@ const RoleAddForm = ({ permissions }: { permissions: Permission[] }) => {
     return permissions.filter(
       (p) =>
         p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        p.name?.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [permissions, searchQuery]);
 
@@ -85,11 +88,11 @@ const RoleAddForm = ({ permissions }: { permissions: Permission[] }) => {
 
   const togglePermission = (permission: Permission) => {
     const isSelected = selectedPermissions.some(
-      (p) => p.permissionId === permission.id
+      (p) => p.permissionId === permission.id,
     );
     if (isSelected) {
       setSelectedPermissions((prev) =>
-        prev.filter((p) => p.permissionId !== permission.id)
+        prev.filter((p) => p.permissionId !== permission.id),
       );
     } else {
       setSelectedPermissions((prev) => [
@@ -105,7 +108,7 @@ const RoleAddForm = ({ permissions }: { permissions: Permission[] }) => {
 
   const removePermission = (permissionId: string) => {
     setSelectedPermissions((prev) =>
-      prev.filter((p) => p.permissionId !== permissionId)
+      prev.filter((p) => p.permissionId !== permissionId),
     );
   };
 
@@ -231,7 +234,7 @@ const RoleAddForm = ({ permissions }: { permissions: Permission[] }) => {
                             ) : (
                               filteredPermissions.map((permission) => {
                                 const isSelected = selectedPermissions.some(
-                                  (p) => p.permissionId === permission.id
+                                  (p) => p.permissionId === permission.id,
                                 );
                                 return (
                                   <Item
