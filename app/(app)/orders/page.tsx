@@ -15,15 +15,21 @@ import {
 } from "@/components/ui/accordion";
 import { getOrders } from "@/lib/data/orders";
 import { getStatusColor } from "@/lib/utils";
+import { OrderStatus } from "@prisma/client";
 
-export default async function OrdersPage() {
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: OrderStatus }>;
+}) {
   const session = await auth();
+  const { status } = await searchParams;
 
   if (!session) {
     return null;
   }
 
-  const orders = await getOrders();
+  const orders = await getOrders(status);
 
   console.log(orders);
 
@@ -44,25 +50,52 @@ export default async function OrdersPage() {
     <>
       <MidtransScript />
       <div className='min-h-screen bg-background'>
-        <header className='border-b'>
-          <div className='container mx-auto px-4 py-4'>
-            <Button asChild variant='ghost'>
-              <Link href='/'>← Back to Home</Link>
+        <div className='container'>
+          <Button asChild variant='link' className='px-0'>
+            <Link href='/'>← Back to Home</Link>
+          </Button>
+        </div>
+
+        <main className='container mx-auto px-4 py-0 sm:py-8'>
+          <h1 className='text-3xl font-bold'>My Orders</h1>
+          <div className='flex space-x-2 py-2 overflow-x-auto w-full mb-4'>
+            <Button
+              asChild
+              variant='outline'
+              size='sm'
+              className={`rounded-full ${!status ? "bg-primary text-primary-foreground" : "border border-primary text-primary"}`}>
+              <Link href='/orders'>Semua</Link>
+            </Button>
+            <Button
+              asChild
+              variant='outline'
+              size='sm'
+              className={`rounded-full ${status === "PAID" ? "bg-primary text-primary-foreground" : "border border-primary text-primary"}`}>
+              <Link href='/orders?status=PAID'>Sukses</Link>
+            </Button>
+            <Button
+              asChild
+              variant='outline'
+              size='sm'
+              className={`rounded-full ${status === "WAIT_PAYMENT" ? "bg-primary text-primary-foreground" : "border border-primary text-primary"}`}>
+              <Link href='/orders?status=WAIT_PAYMENT'>
+                Menunggu Pembayaran
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant='outline'
+              size='sm'
+              className={`rounded-full ${status === "CANCELLED" ? "bg-primary text-primary-foreground" : "border border-primary text-primary"}`}>
+              <Link href='/orders?status=CANCELLED'>Gagal</Link>
             </Button>
           </div>
-        </header>
-
-        <main className='container mx-auto px-4 py-8'>
-          <h1 className='text-3xl font-bold mb-6'>My Orders</h1>
           {orders?.data?.length === 0 ? (
             <Card>
               <CardContent className='py-8 text-center'>
                 <p className='text-muted-foreground mb-4'>
-                  You have no orders yet
+                  Tidak ada pesanan yang ditemukan.
                 </p>
-                <Button asChild>
-                  <Link href='/venues'>Browse Venues</Link>
-                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -80,7 +113,7 @@ export default async function OrdersPage() {
                     <div className=' flex-1 grid grid-cols-2 md:flex items-center gap-2 md:gap-6 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 bg-muted rounded-t-lg py-4'>
                       <HeaderTitle value={order.venue.name} title='Venue' />
                       <HeaderTitle
-                        value={`#${order.orderNumber}`}
+                        value={`#${String(order.orderNumber).slice(-4).toUpperCase()}`}
                         title='OrderId'
                       />
                       <HeaderTitle
@@ -88,7 +121,7 @@ export default async function OrdersPage() {
                         title='Total Price'
                       />
                       <HeaderTitle
-                        value={format(order.createdAt, "PPP p")}
+                        value={format(order.createdAt, "dd MMM yyyy")}
                         title='Order Date'
                       />
                       <HeaderTitle
@@ -195,7 +228,7 @@ export default async function OrdersPage() {
                   </AccordionContent>
                   {(order.status === "WAIT_PAYMENT" ||
                     order.status === "CREATED") && (
-                    <CardFooter className='pb-4 flex justify-end gap-2 px-6 border-t'>
+                    <CardFooter className='pb-4 flex justify-end gap-2 px-2 sm:px-6 border-t'>
                       <Button variant='destructive' className=' cursor-pointer'>
                         Batalkan Pesanan
                       </Button>
@@ -211,3 +244,5 @@ export default async function OrdersPage() {
     </>
   );
 }
+
+// QAWLQG

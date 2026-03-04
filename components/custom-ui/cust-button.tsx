@@ -15,7 +15,7 @@ const CustButton = () => {
           scale: 1.05,
         },
       }}
-      className='group relative rounded-full px-6 py-4 border-2 border-primary text-primary shadow-sm flex items-center justify-center gap-2 font-extrabold cursor-pointer overflow-hidden'>
+      className='w-full group relative rounded-full px-6 py-4 border-2 border-primary text-primary shadow-sm flex items-center justify-center gap-2 font-extrabold cursor-pointer overflow-hidden'>
       <motion.div
         className='absolute bottom-0 z-0 left-0 bg-primary'
         variants={{

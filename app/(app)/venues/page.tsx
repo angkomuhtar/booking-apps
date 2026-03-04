@@ -20,10 +20,10 @@ export default async function VenuesPage() {
   return (
     <div className='min-h-screen bg-background'>
       <section className='bg-[url(/image/bg-2.png)] bg-cover bg-right bg-no-repeat relative border-b'>
-        <div className='absolute top-0 sm:right-[30%] lg:right-[46%] h-full overflow-hidden z-10'>
+        <div className='absolute top-0 w-full right-[10%] sm:right-[30%] lg:right-[46%] h-full overflow-hidden z-10'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
-            className='object-contain w-full h-full sm:h-[110%] overflow-hidden'
+            className='object-contain sm:w-full w-[120%] h-[120%] sm:h-[110%] overflow-hidden'
             viewBox='0 0 649 578'>
             <path
               fill='#FFF'
@@ -39,10 +39,10 @@ export default async function VenuesPage() {
             />
           </svg>
         </div>
-        <div className='container mx-auto px-4 py-16 z-20 relative'>
-          <div className='grid md:grid-cols-2 gap-8 items-center w-5/6 sm:w-full'>
+        <div className='container mx-auto px-4 py-8 sm:py-16 z-20 relative'>
+          <div className='grid md:grid-cols-2 gap-8 items-center w-4/6 sm:w-full'>
             <div>
-              <h2 className='text-4xl md:text-5xl font-bold mb-4 text-black'>
+              <h2 className='text-2xl sm:text-4xl md:text-5xl font-bold mb-4 text-black'>
                 Temukan Venue Terbaik
               </h2>
             </div>
@@ -52,7 +52,7 @@ export default async function VenuesPage() {
       </section>
       <header className=''>
         <div className='container mx-auto px-4 py-4'>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-6 text-center'>
+          <div className='grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center'>
             <div className='rounded-full px-6 py-4 bg-white hover:border-primary/50 transition-all shadow-sm'>
               <select
                 name='sport'
@@ -98,7 +98,9 @@ export default async function VenuesPage() {
             </Popover> */}
 
             {/* <LiquidButton>Liquid Button</LiquidButton> */}
-            <CustButton />
+            <div className='col-span-2'>
+              <CustButton />
+            </div>
           </div>
         </div>
       </header>

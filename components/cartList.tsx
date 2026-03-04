@@ -74,7 +74,11 @@ const CartList = () => {
         setOpen(false);
         router.push("/orders");
       } else {
-        toast.error(result.message);
+        if (result.message === "Unauthorized") {
+          router.push("/login");
+        } else {
+          toast.error(result.message);
+        }
       }
     } catch {
       toast.error("Gagal membuat order");
@@ -210,7 +214,7 @@ const CartList = () => {
                             code :
                           </span>
                           <span className='font-semibold leading-3'>
-                            {item.id}
+                            {String(item.id).slice(-5).toUpperCase()}
                           </span>
                         </div>
                         <div className='flex flex-col text-[11px]'>

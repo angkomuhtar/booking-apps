@@ -12,6 +12,7 @@ import { OrderStatus, OrderItemType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { checkItemsAvailability } from "../utils";
 import { snap } from "../midtrans";
+import { redirect } from "next/navigation";
 
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -40,6 +41,11 @@ type CreateOrderInput = {
 export async function createOrder(input: CreateOrderInput) {
   try {
     const session = await requireAuth();
+
+    if (!session) {
+      return { success: false, message: "Unauthorized" };
+    }
+    console.log("create order", session);
 
     if (!input.items || input.items.length === 0) {
       return { success: false, message: "Keranjang kosong" };
@@ -262,7 +268,9 @@ export async function getOrderById(id: string) {
 
 export async function getUserOrders(userId: string) {
   const session = await requireAuth();
-
+  if (!session) {
+    return { success: false, message: "Unauthorized" };
+  }
   if (session.user.id !== userId && session.user.role === "USER") {
     throw new Error("Forbidden: Cannot access other user's orders");
   }
@@ -301,6 +309,11 @@ export async function getUserOrders(userId: string) {
 }
 
 export async function getVenueOrders(venueId: string) {
+  const session = await requireAuth();
+  if (!session) {
+    return { success: false, message: "Unauthorized" };
+  }
+
   await requireVenueAccess(venueId);
 
   return await prisma.order.findMany({
@@ -375,6 +388,10 @@ export async function getOrdersByStatus(status: OrderStatus) {
 
 export async function getUpcomingCourtBookings(userId: string) {
   const session = await requireAuth();
+
+  if (!session) {
+    return { success: false, message: "Unauthorized" };
+  }
 
   if (session.user.id !== userId && session.user.role === "USER") {
     throw new Error("Forbidden: Cannot access other user's orders");

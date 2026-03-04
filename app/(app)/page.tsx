@@ -27,7 +27,7 @@ export default async function Home() {
         <div className='absolute top-0 sm:right-[30%] lg:right-[26%] h-full overflow-hidden z-10'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
-            className='object-contain w-full h-full sm:h-[110%] overflow-hidden'
+            className='object-contain sm:w-full w-[120%] h-[120%] sm:h-[110%] overflow-hidden'
             viewBox='0 0 649 578'>
             <path
               fill='#FFF'
@@ -61,7 +61,7 @@ export default async function Home() {
                   asChild
                   size='lg'
                   variant='secondary'
-                  className='shadow-lg bg-primary hover:bg-primary/50 font-bold'>
+                  className='shadow-lg bg-primary hover:bg-primary/80 font-bold text-white'>
                   <Link href='/venues' className='gap-2'>
                     Browse Venues
                     <ChevronRight className='h-4 w-4' />
@@ -74,7 +74,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className='py-24 bg-muted/50'>
+      <section className='py-8 sm:py-24 bg-muted/50'>
         <div className='container px-4'>
           <div>
             <h3 className='text-3xl font-bold'>Find Your Perfect Court</h3>
@@ -82,7 +82,7 @@ export default async function Home() {
               Search and book badminton & padel courts in just a few clicks
             </p>
           </div>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-6 text-center'>
+          <div className='grid grid-cols-2 md:grid-cols-4 sm:gap-6 gap-3 text-center'>
             <div className='rounded-full px-6 py-4 bg-white hover:border-primary/50 transition-all shadow-sm'>
               <select
                 name='sport'
@@ -109,7 +109,7 @@ export default async function Home() {
               </select>
             </div>
 
-            <Popover>
+            {/* <Popover>
               <PopoverTrigger
                 asChild
                 className='rounded-full px-6 py-4 bg-white shadow-sm'>
@@ -125,10 +125,12 @@ export default async function Home() {
                   className='w-full'
                 />
               </PopoverContent>
-            </Popover>
+            </Popover> */}
 
             {/* <LiquidButton>Liquid Button</LiquidButton> */}
-            <CustButton />
+            <div className='col-span-2'>
+              <CustButton />
+            </div>
           </div>
         </div>
       </section>
@@ -164,15 +166,17 @@ export default async function Home() {
 
       <main className='container py-12'>
         <section>
-          <div className='flex items-center'>
+          <div className='flex items-center justify-between'>
             <div>
-              <h2 className='text-2xl font-bold mb-2'>Popular Choice</h2>
+              <h2 className='md:text-2xl text-lg font-bold sm:mb-2 mb-1'>
+                Popular Choice
+              </h2>
               <div className='bg-primary h-1.5 w-20'></div>
             </div>
             <div className='mx-4 h-8 border-l ' />
-            <button className='text-primary font-medium cursor-pointer group'>
+            <button className='text-primary font-medium cursor-pointer group text-sm'>
               See All Venues
-              <ArrowRight className='inline-block h-5 w-5 ml-3 group-hover:translate-x-2 duration-200 ease-in-out' />
+              <ArrowRight className='inline-block size-4 md:size-5 ml-3 group-hover:translate-x-2 duration-200 ease-in-out' />
             </button>
           </div>
           <div className='grid lg:grid-cols-5 gap-4 mt-6 py-2'>

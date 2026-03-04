@@ -9,14 +9,16 @@ export async function getSession() {
 export async function requireAuth() {
   const session = await getSession();
   if (!session?.user) {
-    // throw new Error("Unauthorized");
-    return redirect("/login");
+    throw new Error("Unauthorized");
   }
   return session;
 }
 
 export async function requireSuperAdmin() {
   const session = await requireAuth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
   if (session.user.role !== "Super Admin") {
     throw new Error("Forbidden: Super Admin access required");
   }
@@ -25,6 +27,9 @@ export async function requireSuperAdmin() {
 
 export async function requireVenueAdmin() {
   const session = await requireAuth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
   if (
     session.user.role !== "Venue Admin" &&
     session.user.role !== "Super Admin"
@@ -36,6 +41,9 @@ export async function requireVenueAdmin() {
 
 export async function canAccessVenue(venueId: string) {
   const session = await requireAuth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
 
   if (session.user.role === "Super Admin" || session.user.accessAllVenues) {
     return true;
@@ -54,6 +62,9 @@ export async function canAccessVenue(venueId: string) {
 
 export async function getAccessibleVenues() {
   const session = await requireAuth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
   if (session.user.accessAllVenues) {
     const venues = await prisma.venue.findMany({
       select: {
@@ -85,6 +96,9 @@ export async function getAccessibleVenues() {
 // get all venue ids that the user has access to
 export async function getAccessibleVenueIds() {
   const session = await requireAuth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
 
   if (session.user.accessAllVenues) {
     return {
@@ -113,6 +127,9 @@ export async function requireVenueAccess(venueId: string) {
 
 export async function hasPermission(permissionCode: string) {
   const session = await requireAuth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },

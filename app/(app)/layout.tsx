@@ -4,7 +4,7 @@ import React from "react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className='min-h-screen bg-background font-sans'>
+    <div className='min-h-screen bg-background font-sans pb-12 lg:pb-0'>
       <AppNav />
       {children}
       <AppFooter />

@@ -11,7 +11,7 @@ model User {
   id              String         @id @default(cuid())
   name            String
   email           String         @unique
-  password        String
+  password        String?
   phone           String?
   roleId          String?
   accessAllVenues Boolean        @default(false)
@@ -91,7 +91,7 @@ model Venue {
 model Court {
   id              String         @id @default(cuid())
   name            String
-  type            String? 
+  type            String?
   floor           String?
   sessionDuration Int            @default(60)
   pricePerHour    Int

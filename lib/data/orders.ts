@@ -1,11 +1,15 @@
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import { OrderStatus } from "@prisma/client";
 
-export async function getOrders() {
+export async function getOrders(status?: OrderStatus) {
   try {
     const session = await requireAuth();
     const orders = await prisma.order.findMany({
-      where: { userId: session.user.id },
+      where: {
+        userId: session.user.id,
+        ...(status ? { status } : {}),
+      },
       include: {
         venue: true,
         items: {
@@ -18,7 +22,7 @@ export async function getOrders() {
     });
 
     if (!orders) {
-      return { success: false, data: null, message: "Venue tidak ditemukan" };
+      return { success: false, data: null, message: "Orders tidak ditemukan" };
     }
 
     return { success: true, data: orders, message: "Berhasil mengambil data" };
@@ -26,7 +30,7 @@ export async function getOrders() {
     return {
       success: false,
       data: null,
-      message: "Gagal mengambil data venue",
+      message: "Gagal mengambil data orders",
     };
   }
 }

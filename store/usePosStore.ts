@@ -24,7 +24,6 @@ export type CartItem = {
 };
 
 type PosState = {
-  _hasHydrated: boolean;
   selectedVenue: Venue | null;
   setSelectedVenue: (venue: Venue | null) => void;
   addToCart: (item: CartItem) => void;
@@ -41,7 +40,6 @@ type PosState = {
 export const usePosStore = create<PosState>()(
   persist(
     (set, get) => ({
-      _hasHydrated: false,
       selectedVenue: null,
       activeCart: [],
       draft: [],
@@ -122,17 +120,6 @@ export const usePosStore = create<PosState>()(
         set({ activeCart: [] });
       },
     }),
-    { name: "pos-venue", skipHydration: true },
+    { name: "pos-venue" },
   ),
 );
-
-export const useHydratePosStore = () => {
-  const hasHydrated = usePosStore((state) => state._hasHydrated);
-
-  if (!hasHydrated && typeof window !== "undefined") {
-    usePosStore.persist.rehydrate();
-    usePosStore.setState({ _hasHydrated: true });
-  }
-
-  return hasHydrated;
-};

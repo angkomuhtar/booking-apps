@@ -6,14 +6,21 @@ const AppFooter = () => {
   return (
     <footer className='bg-secondary text-secondary-foreground mt-16'>
       <div className='container mx-auto px-4 py-12'>
-        <div className='grid md:grid-cols-4 gap-8 mb-8'>
-          <div>
-            <div className='flex items-center gap-2 mb-4'>
-              <div className='bg-primary p-2 rounded-lg'>
-                <Trophy className='h-5 w-5 text-primary-foreground' />
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-8 mb-8'>
+          <div className='grid gap-2 col-span-2 md:col-span-1'>
+            <Link href='/' className='flex items-center gap-2 group'>
+              <div className='bg-primary p-1 rounded-lg group-hover:scale-105 transition-transform'>
+                <img src='/image/logo.png' alt='Logo' className='size-9' />
               </div>
-              <h3 className='text-xl font-bold'>Ayo Booking</h3>
-            </div>
+              <div>
+                <h1 className='text-xl font-bold text-primary tracking-tighter'>
+                  palmpadel.id
+                </h1>
+                <p className='text-xs text-muted-foreground tracking-tight'>
+                  court & cafe booking
+                </p>
+              </div>
+            </Link>
             <p className='text-sm text-secondary-foreground/80 mb-4'>
               Indonesia&rsquo;s premier court booking platform for badminton and
               padel enthusiasts.
@@ -76,7 +83,7 @@ const AppFooter = () => {
             </ul>
           </div>
 
-          <div>
+          <div className='col-span-2 md:col-span-1'>
             <h4 className='font-semibold mb-4'>Contact Info</h4>
             <ul className='space-y-2 text-sm'>
               <li className='flex items-center gap-2'>
