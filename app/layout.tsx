@@ -107,8 +107,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Ayo Booking - Book Your Sports Court",
-  description: "Book badminton and padel courts easily online",
+  title: "Palm Padel - Book Your Sports Court",
+  description: "Book padel courts & Cafe Reservation easily online",
 };
 
 export default function RootLayout({

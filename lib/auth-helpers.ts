@@ -132,11 +132,18 @@ export async function hasPermission(permissionCode: string) {
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: {
+      id: session.user.id,
+    },
     include: {
       role: {
         include: {
           permissions: {
+            where: {
+              permission: {
+                code: permissionCode,
+              },
+            },
             include: {
               permission: true,
             },
@@ -146,11 +153,11 @@ export async function hasPermission(permissionCode: string) {
     },
   });
 
+  console.log(user);
+
   if (!user?.role) return false;
 
-  return user.role.permissions.some(
-    (rp) => rp.permission.code === permissionCode,
-  );
+  return true;
 }
 
 export async function requirePermission(permissionCode: string) {

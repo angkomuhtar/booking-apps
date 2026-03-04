@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import imageCompression from "browser-image-compression";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,6 +46,7 @@ export default function AddVenuePage() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [cities, setCities] = useState<City[]>([]);
 
@@ -94,26 +96,60 @@ export default function AddVenuePage() {
   const selectedFacilities = watch("facilities");
   const selectedImages = watch("images");
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
+
     const currentImages = selectedImages || [];
     if (currentImages.length >= 10) {
       toast.error("Maksimal 10 gambar yang diizinkan");
-      return false;
+      return;
     }
-    const newImages = Array.from(files).map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-      name: file.name,
-    }));
-    const check = currentImages.find((img) =>
-      newImages.some((newImg) => newImg.name === img.name)
-    );
 
-    if (check) return false;
-    setValue("images", [...currentImages, ...newImages]);
-    e.target.value = "";
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const compressionOptions = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      fileType: "image/webp",
+    };
+
+    setIsCompressing(true);
+    try {
+      const newImages = await Promise.all(
+        Array.from(files).map(async (file) => {
+          if (file.size > MAX_FILE_SIZE) {
+            toast.error(
+              `File ${file.name} melebihi batas 5MB dan tidak akan diunggah`,
+            );
+            return null;
+          }
+          const compressedFile = await imageCompression(
+            file,
+            compressionOptions,
+          );
+          return {
+            file: compressedFile,
+            preview: URL.createObjectURL(compressedFile),
+            name: file.name,
+          };
+        }),
+      );
+
+      const validImages = newImages.filter(Boolean) as typeof currentImages;
+      const check = currentImages.find((img) =>
+        validImages.some((newImg) => newImg.name === img.name),
+      );
+      if (check) return;
+
+      setValue("images", [...currentImages, ...validImages]);
+    } catch (error) {
+      console.error("Compression error:", error);
+      toast.error("Gagal mengkompresi gambar");
+    } finally {
+      setIsCompressing(false);
+      e.target.value = "";
+    }
   };
 
   const handleRemoveImage = (index: number) => {
@@ -124,7 +160,7 @@ export default function AddVenuePage() {
     }
     setValue(
       "images",
-      currentImages.filter((_, i) => i !== index)
+      currentImages.filter((_, i) => i !== index),
     );
   };
 
@@ -135,7 +171,7 @@ export default function AddVenuePage() {
     } else {
       setValue(
         "facilities",
-        current.filter((id) => id !== facilityId)
+        current.filter((id) => id !== facilityId),
       );
     }
   };
@@ -441,12 +477,13 @@ export default function AddVenuePage() {
                   type='button'
                   variant='outline'
                   className='mt-4'
+                  disabled={isCompressing}
                   onClick={() => document.getElementById("image")?.click()}>
                   <Icon
                     icon='icon-park-outline:upload-one'
                     className='w-4 h-4'
                   />
-                  Pilih Gambar
+                  {isCompressing ? "Mengkompresi..." : "Pilih Gambar"}
                 </Button>
               </div>
               <p className='text-xs font-semibold text-muted-foreground mt-1'>

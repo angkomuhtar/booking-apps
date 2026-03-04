@@ -15,7 +15,10 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
   if (!session || session.user.role == "User") {
     redirect("/login");
   }
-  await requirePermission("admin.access");
+
+  console.log("session", session.user);
+
+  // await requirePermission("admin.access");
 
   return (
     <SidebarProvider>

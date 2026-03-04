@@ -20,17 +20,17 @@ export async function uploadToR2(
   file: Buffer,
   fileName: string,
   contentType: string,
-  folder: string
+  folder: string,
 ): Promise<string> {
   const ext = fileName.split(".").pop();
-  const key = `ayo-apps/${folder}/${randomUUID()}.${ext}`;
+  const key = `${folder}/${randomUUID()}.${ext}`;
   await r2Client.send(
     new PutObjectCommand({
       Bucket: R2_BUCKET_NAME,
       Key: key,
       Body: file,
       ContentType: contentType,
-    })
+    }),
   );
 
   return `${R2_PUBLIC_URL}/${key}`;
