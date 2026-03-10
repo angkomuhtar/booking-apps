@@ -13,11 +13,22 @@ import { ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
 import { Icon } from "@iconify/react";
 import { useCartStore } from "@/store/useCartStore";
-import { createOrder } from "@/lib/actions/order";
+
 import { toast } from "sonner";
 import moment from "moment";
 import { Input } from "./ui/input";
 import { useRouter } from "next/navigation";
+import { Field, FieldLabel } from "./ui/field";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Textarea } from "./ui/textarea";
+import { createOrder } from "@/lib/data/orders";
 
 const CartList = () => {
   const {
@@ -30,6 +41,10 @@ const CartList = () => {
     updateQuantity,
   } = useCartStore();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [paymentType, setPaymentType] = useState<
+    "DOWN_PAYMENT" | "FULL_PAYMENT" | ""
+  >("");
+  const [note, setNote] = useState("");
   const [open, setOpen] = useState(false);
   const items = getItemsByType("COURT_BOOKING");
   const products = getItemsByType("PRODUCT");
@@ -41,7 +56,10 @@ const CartList = () => {
       toast.error("Keranjang kosong");
       return;
     }
-
+    if (paymentType == "") {
+      toast.error("Pilih jenis pembayaran");
+      return;
+    }
     setIsCheckingOut(true);
     try {
       const itemsCourt = items.map((item) => ({
@@ -65,6 +83,8 @@ const CartList = () => {
 
       const result = await createOrder({
         venueId,
+        paymentType: paymentType as "DOWN_PAYMENT" | "FULL_PAYMENT",
+        notes: note,
         items: [...itemsCourt, ...itemsPro],
       });
 
@@ -101,7 +121,7 @@ const CartList = () => {
         <SheetHeader>
           <SheetTitle>Keranjang</SheetTitle>
         </SheetHeader>
-        <div className='grid gap-4 overflow-y-auto [&::-webkit-scrollbar]:w-2 h-full px-2'>
+        <div className='grid pb-4 gap-4 overflow-y-auto [&::-webkit-scrollbar]:w-2 h-full px-2'>
           <div className='border rounded-lg px-2 py-4'>
             <h2 className='mb-2 font-semibold'>Courts</h2>
             <div className='grid flex-1 auto-rows-min gap-4 py-2 border-t'>
@@ -273,6 +293,7 @@ const CartList = () => {
                 ))
               )}
             </div>
+
             {items.length > 0 && (
               <div className='mt-4 text-right text-md bg-muted-foreground/10 rounded p-2 font-semibold'>
                 Subtotal: Rp{" "}
@@ -280,14 +301,91 @@ const CartList = () => {
               </div>
             )}
           </div>
+          <div className='border rounded-lg px-2 py-4 grid gap-4'>
+            <Field>
+              <FieldLabel htmlFor='checkout-exp-month-ts6'>
+                Jenis Pembayaran
+              </FieldLabel>
+              <Select
+                defaultValue=''
+                onValueChange={(value) =>
+                  setPaymentType(value as "DOWN_PAYMENT" | "FULL_PAYMENT")
+                }>
+                <SelectTrigger id='checkout-exp-month-ts6'>
+                  <SelectValue placeholder='Pilih Salah Satu' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value='DOWN_PAYMENT'>
+                      Down Payment (50%)
+                    </SelectItem>
+                    <SelectItem value='FULL_PAYMENT'>Lunas</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor='checkout-note-ts6'>
+                Catatan (opsional)
+              </FieldLabel>
+              <Textarea
+                id='checkout-note-ts6'
+                placeholder='Tambahkan catatan...'
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+              />
+            </Field>
+          </div>
         </div>
 
         {items.length > 0 && (
-          <div className='px-4 py-2 border-b'>
+          <div className='px-4 py-2 border-y grid gap-1.5'>
             <div className='flex justify-between items-center'>
-              <span className='font-medium'>Total</span>
-              <span className='font-bold text-lg'>
+              <span className='text-xs font-medium'>Sub Total</span>
+              <span className='text-xs'>
                 Rp {getTotalPrice().toLocaleString("id-ID")}
+              </span>
+            </div>
+            <div className='flex justify-between items-center'>
+              <span className='text-xs font-medium'>PPN (11%)</span>
+              <span className='text-xs'>
+                Rp {(getTotalPrice() * 0.11).toLocaleString("id-ID")}
+              </span>
+            </div>
+            <div className='flex justify-between items-center'>
+              <span className='text-xs font-medium'>Total</span>
+              <span className='text-xs'>
+                Rp {(getTotalPrice() * 1.11).toLocaleString("id-ID")}
+              </span>
+            </div>
+            <div className='flex justify-between items-center'>
+              <span className='text-xs font-medium'>Jenis Pembayaran</span>
+              <span className='text-xs'>
+                {paymentType == ""
+                  ? "-"
+                  : paymentType === "DOWN_PAYMENT"
+                    ? "Down Payment (50%)"
+                    : "Lunas"}
+              </span>
+            </div>
+            <div className='flex justify-between items-center'>
+              <span className='text-xs font-medium'>Sisa Bayar</span>
+              <span className='text-xs'>
+                {paymentType == ""
+                  ? "-"
+                  : paymentType === "DOWN_PAYMENT"
+                    ? `Rp ${(getTotalPrice() * 0.555).toLocaleString("id-ID")}`
+                    : "Rp 0"}
+              </span>
+            </div>
+            <div className='flex justify-between items-center'>
+              <span className='font-medium'>Total Bayar</span>
+              <span className='font-bold text-lg'>
+                {paymentType == ""
+                  ? "-"
+                  : paymentType === "DOWN_PAYMENT"
+                    ? `Rp ${(getTotalPrice() * 0.555).toLocaleString("id-ID")}`
+                    : `Rp ${(getTotalPrice() * 1.11).toLocaleString("id-ID")}`}
               </span>
             </div>
           </div>

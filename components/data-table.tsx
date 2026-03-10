@@ -59,7 +59,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className='rounded-md border border-'>
+    <div className='rounded-md border bg-white overflow-x-auto'>
       {searchKey && (
         <div className='flex items-center justify-between p-4'>
           <Input
@@ -76,7 +76,7 @@ export function DataTable<TData, TValue>({
       )}
 
       <div className='border-y bg-white'>
-        <Table>
+        <Table className='min-w-[800px]'>
           <TableHeader className='bg-muted px-4'>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

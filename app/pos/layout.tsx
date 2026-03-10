@@ -38,7 +38,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         {/* sidebar */}
         <div className='flex flex-1 w-full overflow-hidden'>
           <PosSidebar />
-          <div className='flex-1 flex'>{children}</div>
+          {children}
         </div>
       </main>
     </ClientProvider>

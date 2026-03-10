@@ -179,7 +179,7 @@ export default async function Home() {
               <ArrowRight className='inline-block size-4 md:size-5 ml-3 group-hover:translate-x-2 duration-200 ease-in-out' />
             </button>
           </div>
-          <div className='grid lg:grid-cols-5 gap-4 mt-6 py-2'>
+          <div className='grid lg:grid-cols-5 gap-4 mt-6 py-2 items-stretch'>
             {venues.length === 0 ? (
               <div>No venues found.</div>
             ) : (

@@ -103,7 +103,7 @@ const AppFooter = () => {
         </div>
 
         <div className='border-t border-secondary-foreground/20 pt-6 text-center text-sm text-secondary-foreground/60'>
-          <p>&copy; 2025 Ayo Booking. All rights reserved.</p>
+          <p>&copy; 2026 palmpadel.id</p>
         </div>
       </div>
     </footer>

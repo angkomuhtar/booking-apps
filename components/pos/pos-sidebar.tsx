@@ -18,7 +18,7 @@ const PosSidebar = () => {
     },
     {
       label: "Orders List",
-      href: "#",
+      href: "/pos/orders",
       icon: ClipboardList,
     },
   ];
@@ -28,7 +28,7 @@ const PosSidebar = () => {
   console.log(pathname);
 
   return (
-    <div className='bg-white py-2 px-4 border-r shadow-xs w-64 flex flex-col justify-between'>
+    <div className='bg-white py-2 px-4 border-r shadow-xs w-64 flex flex-col justify-between min-h-screen'>
       {/* Additional POS navigation items can go here */}
       <div className='main-nav'>
         <div className='text-sm text-gray-700 font-semibold'>

@@ -78,6 +78,7 @@ export async function createProduct(input: z.infer<typeof ProductSchema>) {
         description: input.description,
         price: input.price,
         stock: input.stock,
+        category: input.category,
         imageUrl: url || null,
         isActive: input.isActive,
       },
@@ -221,247 +222,268 @@ export async function updateProduct(
   }
 }
 
-export async function getUserOrders(userId: string) {
-  const session = await requireAuth();
+export async function getProductCategories(venueId: string) {
+  try {
+    await requirePermission("products.view");
+    const categories = await prisma.product.groupBy({
+      by: ["category"],
+      where: { venueId },
+      orderBy: { category: "asc" },
+    });
 
-  if (session.user.id !== userId && session.user.role === "USER") {
-    throw new Error("Forbidden: Cannot access other user's orders");
+    return { success: true, data: categories };
+  } catch (error) {
+    console.error("Get product categories error:", error);
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "Gagal mengambil kategori produk" };
   }
-
-  return await prisma.order.findMany({
-    where: { userId },
-    select: {
-      id: true,
-      orderNumber: true,
-      totalPrice: true,
-      status: true,
-      createdAt: true,
-      venue: {
-        select: {
-          id: true,
-          name: true,
-          address: true,
-          city: true,
-        },
-      },
-      items: {
-        select: {
-          id: true,
-          itemType: true,
-          name: true,
-          price: true,
-          quantity: true,
-          date: true,
-          startTime: true,
-          endTime: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
 }
 
-export async function getVenueOrders(venueId: string) {
-  await requireVenueAccess(venueId);
+// export async function getProductById(productId: string) {
 
-  return await prisma.order.findMany({
-    where: { venueId },
-    select: {
-      id: true,
-      orderNumber: true,
-      totalPrice: true,
-      status: true,
-      paymentProof: true,
-      createdAt: true,
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-        },
-      },
-      items: {
-        select: {
-          id: true,
-          itemType: true,
-          name: true,
-          price: true,
-          quantity: true,
-          date: true,
-          startTime: true,
-          endTime: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-}
+// export async function getUserOrders(userId: string) {
+//   const session = await requireAuth();
 
-export async function getOrdersByStatus(status: OrderStatus) {
-  return await prisma.order.findMany({
-    where: { status },
-    select: {
-      id: true,
-      orderNumber: true,
-      totalPrice: true,
-      status: true,
-      createdAt: true,
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      venue: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      items: {
-        select: {
-          id: true,
-          itemType: true,
-          name: true,
-          price: true,
-          quantity: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-}
+//   if (session.user.id !== userId && session.user.role === "USER") {
+//     throw new Error("Forbidden: Cannot access other user's orders");
+//   }
 
-export async function getUpcomingCourtBookings(userId: string) {
-  const session = await requireAuth();
+//   return await prisma.order.findMany({
+//     where: { userId },
+//     select: {
+//       id: true,
+//       orderNumber: true,
+//       totalPrice: true,
+//       status: true,
+//       createdAt: true,
+//       venue: {
+//         select: {
+//           id: true,
+//           name: true,
+//           address: true,
+//           city: true,
+//         },
+//       },
+//       items: {
+//         select: {
+//           id: true,
+//           itemType: true,
+//           name: true,
+//           price: true,
+//           quantity: true,
+//           date: true,
+//           startTime: true,
+//           endTime: true,
+//         },
+//       },
+//     },
+//     orderBy: { createdAt: "desc" },
+//   });
+// }
 
-  if (session.user.id !== userId && session.user.role === "USER") {
-    throw new Error("Forbidden: Cannot access other user's orders");
-  }
+// export async function getVenueOrders(venueId: string) {
+//   await requireVenueAccess(venueId);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+//   return await prisma.order.findMany({
+//     where: { venueId },
+//     select: {
+//       id: true,
+//       orderNumber: true,
+//       totalPrice: true,
+//       status: true,
+//       paymentProof: true,
+//       createdAt: true,
+//       user: {
+//         select: {
+//           id: true,
+//           name: true,
+//           email: true,
+//           phone: true,
+//         },
+//       },
+//       items: {
+//         select: {
+//           id: true,
+//           itemType: true,
+//           name: true,
+//           price: true,
+//           quantity: true,
+//           date: true,
+//           startTime: true,
+//           endTime: true,
+//         },
+//       },
+//     },
+//     orderBy: { createdAt: "desc" },
+//   });
+// }
 
-  return await prisma.order.findMany({
-    where: {
-      userId,
-      status: {
-        in: ["WAIT_PAYMENT", "PAID", "PROCESSING"],
-      },
-      items: {
-        some: {
-          itemType: "COURT_BOOKING",
-          date: {
-            gte: today,
-          },
-        },
-      },
-    },
-    select: {
-      id: true,
-      orderNumber: true,
-      totalPrice: true,
-      status: true,
-      venue: {
-        select: {
-          id: true,
-          name: true,
-          address: true,
-          city: true,
-        },
-      },
-      items: {
-        where: {
-          itemType: "COURT_BOOKING",
-          date: {
-            gte: today,
-          },
-        },
-        select: {
-          id: true,
-          itemId: true,
-          name: true,
-          price: true,
-          date: true,
-          startTime: true,
-          endTime: true,
-          duration: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-}
+// export async function getOrdersByStatus(status: OrderStatus) {
+//   return await prisma.order.findMany({
+//     where: { status },
+//     select: {
+//       id: true,
+//       orderNumber: true,
+//       totalPrice: true,
+//       status: true,
+//       createdAt: true,
+//       user: {
+//         select: {
+//           id: true,
+//           name: true,
+//           email: true,
+//         },
+//       },
+//       venue: {
+//         select: {
+//           id: true,
+//           name: true,
+//         },
+//       },
+//       items: {
+//         select: {
+//           id: true,
+//           itemType: true,
+//           name: true,
+//           price: true,
+//           quantity: true,
+//         },
+//       },
+//     },
+//     orderBy: { createdAt: "desc" },
+//   });
+// }
 
-export async function getOrderStats(venueId?: string) {
-  const whereClause: Prisma.OrderWhereInput = {};
+// export async function getUpcomingCourtBookings(userId: string) {
+//   const session = await requireAuth();
 
-  if (venueId) {
-    await requireVenueAccess(venueId);
-    whereClause.venueId = venueId;
-  }
+//   if (session.user.id !== userId && session.user.role === "USER") {
+//     throw new Error("Forbidden: Cannot access other user's orders");
+//   }
 
-  const [total, pending, paid, processing, completed, cancelled] =
-    await Promise.all([
-      prisma.order.count({ where: whereClause }),
-      prisma.order.count({ where: { ...whereClause, status: "WAIT_PAYMENT" } }),
-      prisma.order.count({ where: { ...whereClause, status: "PAID" } }),
-      prisma.order.count({ where: { ...whereClause, status: "PROCESSING" } }),
-      prisma.order.count({ where: { ...whereClause, status: "COMPLETED" } }),
-      prisma.order.count({ where: { ...whereClause, status: "CANCELLED" } }),
-    ]);
+//   const today = new Date();
+//   today.setHours(0, 0, 0, 0);
 
-  return {
-    total,
-    pending,
-    paid,
-    processing,
-    completed,
-    cancelled,
-  };
-}
+//   return await prisma.order.findMany({
+//     where: {
+//       userId,
+//       status: {
+//         in: ["WAIT_PAYMENT", "PAID", "PROCESSING"],
+//       },
+//       items: {
+//         some: {
+//           itemType: "COURT_BOOKING",
+//           date: {
+//             gte: today,
+//           },
+//         },
+//       },
+//     },
+//     select: {
+//       id: true,
+//       orderNumber: true,
+//       totalPrice: true,
+//       status: true,
+//       venue: {
+//         select: {
+//           id: true,
+//           name: true,
+//           address: true,
+//           city: true,
+//         },
+//       },
+//       items: {
+//         where: {
+//           itemType: "COURT_BOOKING",
+//           date: {
+//             gte: today,
+//           },
+//         },
+//         select: {
+//           id: true,
+//           itemId: true,
+//           name: true,
+//           price: true,
+//           date: true,
+//           startTime: true,
+//           endTime: true,
+//           duration: true,
+//         },
+//       },
+//     },
+//     orderBy: { createdAt: "desc" },
+//   });
+// }
 
-export async function getCourtBookingsForDate(courtId: string, date: Date) {
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
+// export async function getOrderStats(venueId?: string) {
+//   const whereClause: Prisma.OrderWhereInput = {};
 
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
+//   if (venueId) {
+//     await requireVenueAccess(venueId);
+//     whereClause.venueId = venueId;
+//   }
 
-  return await prisma.orderItem.findMany({
-    where: {
-      itemType: "COURT_BOOKING",
-      itemId: courtId,
-      date: {
-        gte: startOfDay,
-        lte: endOfDay,
-      },
-      order: {
-        status: {
-          in: ["WAIT_PAYMENT", "PAID", "PROCESSING", "COMPLETED"],
-        },
-      },
-    },
-    select: {
-      id: true,
-      startTime: true,
-      endTime: true,
-      duration: true,
-      order: {
-        select: {
-          id: true,
-          status: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
-    },
-    orderBy: { startTime: "asc" },
-  });
-}
+//   const [total, pending, paid, processing, completed, cancelled] =
+//     await Promise.all([
+//       prisma.order.count({ where: whereClause }),
+//       prisma.order.count({ where: { ...whereClause, status: "WAIT_PAYMENT" } }),
+//       prisma.order.count({ where: { ...whereClause, status: "PAID" } }),
+//       prisma.order.count({ where: { ...whereClause, status: "PROCESSING" } }),
+//       prisma.order.count({ where: { ...whereClause, status: "COMPLETED" } }),
+//       prisma.order.count({ where: { ...whereClause, status: "CANCELLED" } }),
+//     ]);
+
+//   return {
+//     total,
+//     pending,
+//     paid,
+//     processing,
+//     completed,
+//     cancelled,
+//   };
+// }
+
+// export async function getCourtBookingsForDate(courtId: string, date: Date) {
+//   const startOfDay = new Date(date);
+//   startOfDay.setHours(0, 0, 0, 0);
+
+//   const endOfDay = new Date(date);
+//   endOfDay.setHours(23, 59, 59, 999);
+
+//   return await prisma.orderItem.findMany({
+//     where: {
+//       itemType: "COURT_BOOKING",
+//       itemId: courtId,
+//       date: {
+//         gte: startOfDay,
+//         lte: endOfDay,
+//       },
+//       order: {
+//         status: {
+//           in: ["WAIT_PAYMENT", "PAID", "PROCESSING", "COMPLETED"],
+//         },
+//       },
+//     },
+//     select: {
+//       id: true,
+//       startTime: true,
+//       endTime: true,
+//       duration: true,
+//       order: {
+//         select: {
+//           id: true,
+//           status: true,
+//           user: {
+//             select: {
+//               id: true,
+//               name: true,
+//             },
+//           },
+//         },
+//       },
+//     },
+//     orderBy: { startTime: "asc" },
+//   });
+// }

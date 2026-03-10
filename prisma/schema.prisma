@@ -109,21 +109,23 @@ model Court {
 }
 
 model Order {
-  id               String      @id @default(cuid())
+  id               String           @id @default(cuid())
   userId           String
   venueId          String
-  orderNumber      String      @unique
-  orderSource      OrderSource @default(ONLINE)
+  orderNumber      String           @unique
+  orderSource      OrderSource      @default(ONLINE)
   customerName     String? // nama customer walk-in (jika userId null)
   customerPhone    String? // phone walk-in customer
   cashierId        String? // user ID kasir yang memproses
   subtotal         Int
-  discount         Int         @default(0)
-  totalPrice       Int
+  discount         Int              @default(0)
+  tax              Int              @default(0)
   dpAmount         Int? // jumlah DP yang dibayar
   dpPaidAt         DateTime? // waktu bayar DP
   remainingAmount  Int? // sisa yang harus dibayar
-  status           OrderStatus @default(CREATED)
+  totalPrice       Int
+  status           OrderStatus      @default(CREATED)
+  paymentStatus    PaymentStatus    @default(UNPAID)
   paymentMethod    String?
   paymentProof     String?
   notes            String?
@@ -131,15 +133,30 @@ model Order {
   payment_url      String?
   snap_token       String?
   payment_expireAt DateTime?
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  venue            Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venue            Venue            @relation(fields: [venueId], references: [id], onDelete: Cascade)
   items            OrderItem[]
+  paymentHistories PaymentHistory[]
 
   @@index([userId])
   @@index([venueId])
   @@index([status])
+}
+
+model PaymentHistory {
+  id            String   @id @default(cuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id])
+  amount        Decimal
+  paymentMethod String // CASH, TRANSFER, QRIS, etc
+  paymentType   String // DOWN_PAYMENT, FULL_PAYMENT, INSTALLMENT, REFUND
+  transactionId String? // dari payment gateway
+  paidAt        DateTime @default(now())
+  paidBy        String? // user yang terima pembayaran
+  note          String?
+  createdAt     DateTime @default(now())
 }
 
 enum OrderSource {
@@ -359,6 +376,14 @@ model FloorType {
   courts    Court[]
 }
 
+model Unit {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  symbol    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum AdminRequestStatus {
   PENDING
   APPROVED
@@ -373,12 +398,17 @@ enum DayType {
 
 enum OrderStatus {
   CREATED
-  WAIT_PAYMENT
-  PAID
-  PROCESSING
+  BOOKED
   COMPLETED
   CANCELLED
   REFUNDED
+}
+
+enum PaymentType {
+  DOWN_PAYMENT
+  FULL_PAYMENT
+  INSTALLMENT
+  REFUND
 }
 
 enum OrderItemType {

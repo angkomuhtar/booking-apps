@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app # hot reload
+      - /app/node_modules # jangan overwrite node_modules
+      - /app/.next # jangan overwrite .next
+    env_file:
+      - .env.local
+    depends_on:
+      db:
+        condition: service_healthy # tunggu db siap dulu
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432" # bisa diakses dari TablePlus/DBeaver
+    env_file:
+      - .env.local
+    volumes:
+      - pg_local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U palmpadel -d palmpadel"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pg_local:

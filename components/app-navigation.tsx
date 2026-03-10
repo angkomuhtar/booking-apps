@@ -25,6 +25,7 @@ import { signOut, useSession } from "next-auth/react";
 import CartList from "./cartList";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Icon } from "@iconify/react";
+import { se } from "date-fns/locale";
 
 const AppNav = () => {
   const { data: session } = useSession();
@@ -105,7 +106,7 @@ const AppNav = () => {
                       <DropdownMenuGroup>
                         {session.user?.role != "User" && (
                           <DropdownMenuItem asChild className='cursor-pointer'>
-                            <Link href='/admin'>Admin Page</Link>
+                            <Link href='/admin/dashboard'>Admin Page</Link>
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuGroup>
@@ -178,15 +179,31 @@ const AppNav = () => {
               Orders
             </span>
           </Link>
-          <div className='flex justify-center items-center flex-col space-y-1'>
-            <Icon
-              icon='ion:person-circle-outline'
-              className='size-5 text-primary'
-            />
-            <span className='text-[11px] text-muted-foreground font-semibold'>
-              Account
-            </span>
-          </div>
+          {session ? (
+            <Link
+              href='/account'
+              className='flex justify-center items-center flex-col space-y-1'>
+              <Icon
+                icon='ion:person-circle-outline'
+                className='size-5 text-primary'
+              />
+              <span className='text-[11px] text-muted-foreground font-semibold'>
+                Account
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href='/login'
+              className='flex justify-center items-center flex-col space-y-1'>
+              <Icon
+                icon='ion:person-circle-outline'
+                className='size-5 text-primary'
+              />
+              <span className='text-[11px] text-muted-foreground font-semibold'>
+                Login
+              </span>
+            </Link>
+          )}
         </nav>
       )}
     </>

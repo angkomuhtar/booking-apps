@@ -10,14 +10,14 @@ import {
 } from "@/lib/auth-helpers";
 import { OrderStatus, OrderItemType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { checkItemsAvailability } from "../utils";
+import { checkItemsAvailability } from "../availability";
 import { snap } from "../midtrans";
 import { redirect } from "next/navigation";
 
-function generateOrderNumber(): string {
+function generateOrderNumber({ type }: { type: string }): string {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `ORD-${timestamp}-${random}`;
+  return `ORD-${type}-${timestamp}-${random}`;
 }
 
 type CreateOrderItem = {
@@ -34,8 +34,9 @@ type CreateOrderItem = {
 
 type CreateOrderInput = {
   venueId: string;
-  items: CreateOrderItem[];
+  paymentType: "DOWN_PAYMENT" | "FULL_PAYMENT";
   notes?: string;
+  items: CreateOrderItem[];
 };
 
 export async function createOrder(input: CreateOrderInput) {
@@ -72,11 +73,12 @@ export async function createOrder(input: CreateOrderInput) {
       data: {
         userId: session.user.id,
         venueId: input.venueId,
-        orderNumber: generateOrderNumber(),
+        orderNumber: generateOrderNumber({ type: input.paymentType }),
         subtotal,
         discount: 0,
         totalPrice: subtotal,
-        status: "WAIT_PAYMENT",
+        status: "CREATED",
+        paymentStatus: "UNPAID",
         notes: input.notes,
         items: {
           create: input.items.map((item) => ({
@@ -128,7 +130,6 @@ export async function createOrder(input: CreateOrderInput) {
       data: {
         payment_url: transaction.redirect_url,
         snap_token: transaction.token,
-        status: "WAIT_PAYMENT",
         payment_expireAt: new Date(Date.now() + 10 * 60 * 1000), // 30 minutes from now
       },
     });
@@ -404,7 +405,7 @@ export async function getUpcomingCourtBookings(userId: string) {
     where: {
       userId,
       status: {
-        in: ["WAIT_PAYMENT", "PAID", "PROCESSING"],
+        in: ["BOOKED"],
       },
       items: {
         some: {
@@ -459,21 +460,18 @@ export async function getOrderStats(venueId?: string) {
     whereClause.venueId = venueId;
   }
 
-  const [total, pending, paid, processing, completed, cancelled] =
-    await Promise.all([
-      prisma.order.count({ where: whereClause }),
-      prisma.order.count({ where: { ...whereClause, status: "WAIT_PAYMENT" } }),
-      prisma.order.count({ where: { ...whereClause, status: "PAID" } }),
-      prisma.order.count({ where: { ...whereClause, status: "PROCESSING" } }),
-      prisma.order.count({ where: { ...whereClause, status: "COMPLETED" } }),
-      prisma.order.count({ where: { ...whereClause, status: "CANCELLED" } }),
-    ]);
+  const [total, pending, paid, completed, cancelled] = await Promise.all([
+    prisma.order.count({ where: whereClause }),
+    prisma.order.count({ where: { ...whereClause, status: "CREATED" } }),
+    prisma.order.count({ where: { ...whereClause, status: "BOOKED" } }),
+    prisma.order.count({ where: { ...whereClause, status: "COMPLETED" } }),
+    prisma.order.count({ where: { ...whereClause, status: "CANCELLED" } }),
+  ]);
 
   return {
     total,
     pending,
     paid,
-    processing,
     completed,
     cancelled,
   };
@@ -496,7 +494,7 @@ export async function getCourtBookingsForDate(courtId: string, date: Date) {
       },
       order: {
         status: {
-          in: ["WAIT_PAYMENT", "PAID", "PROCESSING", "COMPLETED"],
+          in: ["CREATED", "BOOKED", "COMPLETED"],
         },
       },
     },
@@ -520,4 +518,44 @@ export async function getCourtBookingsForDate(courtId: string, date: Date) {
     },
     orderBy: { startTime: "asc" },
   });
+}
+
+export async function cancelOrder(orderId: string) {
+  try {
+    const session = await requireAuth();
+    if (!session) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      return { success: false, message: "Order tidak ditemukan" };
+    }
+
+    if (order.userId !== session.user.id && session.user.role === "USER") {
+      return { success: false, message: "Forbidden" };
+    }
+
+    if (order.status === "COMPLETED" || order.status === "BOOKED") {
+      return {
+        success: false,
+        message: "Order sudah dibayar, tidak bisa dibatalkan",
+      };
+    }
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: "CANCELLED" },
+    });
+
+    revalidatePath("/orders");
+
+    return { success: true, message: "Order berhasil dibatalkan" };
+  } catch (error) {
+    console.error("Cancel order error:", error);
+    return { success: false, message: "Gagal membatalkan order" };
+  }
 }

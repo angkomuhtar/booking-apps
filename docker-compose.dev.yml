@@ -1,0 +1,29 @@
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile # pakai Dockerfile prod (versi build)
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env.dev
+    depends_on:
+      db-dev:
+        condition: service_healthy
+    restart: always
+
+  db-dev:
+    image: postgres:17-alpine
+    env_file:
+      - .env.dev
+    volumes:
+      - pg_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U palmdev -d palmdev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  pg_dev:
