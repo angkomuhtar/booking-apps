@@ -60,7 +60,7 @@ const AppNav = () => {
                   href='/venues'
                   className='hover:text-primary transition-colors group'>
                   <span>Venue</span>
-                  <div className='h-1 w-0 group-hover:w-1/2 duration-500 bg-primary'></div>
+                  {/* <div className='h-1 w-0 group-hover:w-1/2 duration-500 bg-primary'></div> */}
                 </Link>
                 <Link
                   href='/orders'
