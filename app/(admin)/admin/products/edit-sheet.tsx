@@ -57,7 +57,7 @@ export function EditSheet({
   open,
   onOpenChange,
 }: EditSheetProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<z.infer<typeof ProductSchema>>({
     resolver: zodResolver(ProductSchema),
     values: {

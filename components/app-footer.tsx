@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone, Trophy } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 

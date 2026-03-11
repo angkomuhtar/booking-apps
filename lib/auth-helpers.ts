@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { forbidden, redirect } from "next/navigation";
+import { forbidden } from "next/navigation";
 
 export async function getSession() {
   return await auth();

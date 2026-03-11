@@ -1,17 +1,6 @@
-import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { CalendarIcon, ChevronRight, MapPin } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import ProductCard from "@/components/custom-ui/product-card";
-import { getPopularVenues, getVenues } from "@/lib/data/venue";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { getPopularVenues } from "@/lib/data/venue";
 import CustButton from "@/components/custom-ui/cust-button";
 
 export default async function VenuesPage() {

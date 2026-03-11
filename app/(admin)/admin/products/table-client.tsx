@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import { DataTable } from "@/components/data-table";
 import { columns, ProductColumn, TableMeta } from "./columns";
 import { DeleteDialog } from "./delete-dialog";
-import { updateCourtStatus } from "@/lib/actions/court";
 import { toast } from "sonner";
 import { updateProductStatus } from "@/lib/actions/products";
 import { EditSheet } from "./edit-sheet";

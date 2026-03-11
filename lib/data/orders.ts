@@ -2,7 +2,7 @@
 
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
-import { OrderItemType, OrderStatus, PaymentType } from "@prisma/client";
+import { OrderItemType, OrderStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { checkItemsAvailability } from "../availability";
 import { snap } from "../midtrans";

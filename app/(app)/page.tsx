@@ -1,22 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import {
-  ChevronRight,
-  Calendar as CalendarIcon,
-  ArrowRight,
-} from "lucide-react";
+import { ChevronRight, ArrowRight } from "lucide-react";
 
 import CustButton from "@/components/custom-ui/cust-button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import ProductCard from "@/components/custom-ui/product-card";
 import { getPopularVenues } from "@/lib/data/venue";
-import { forbidden } from "next/navigation";
 
 export default async function Home() {
   const venues = await getPopularVenues();

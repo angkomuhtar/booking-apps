@@ -3,11 +3,9 @@
 import { prisma } from "@/lib/prisma";
 import {
   getAccessibleVenueIds,
-  requireAuth,
   requirePermission,
   requireVenueAccess,
 } from "@/lib/auth-helpers";
-import { OrderStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import z from "zod";
 import { ProductSchema } from "@/schema/products.schema";

@@ -1,6 +1,6 @@
 "use client";
 import { usePosStore } from "@/store/usePosStore";
-import { BanknoteArrowUp, BanknoteX, FolderArchive, Trash } from "lucide-react";
+import { BanknoteArrowUp, BanknoteX, Trash } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import {

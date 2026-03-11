@@ -6,7 +6,6 @@ import { format } from "date-fns";
 import { PaymentButton } from "@/components/payment-button";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { getStatusColor } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
 import { OrderWithItems } from "./types";
 import { useState } from "react";
 import { cancelOrder } from "@/lib/data/orders";

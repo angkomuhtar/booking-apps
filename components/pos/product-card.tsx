@@ -3,7 +3,6 @@
 import { usePosStore } from "@/store/usePosStore";
 import { ShoppingBag } from "lucide-react";
 import React from "react";
-import { Button } from "../ui/button";
 import { CartItem } from "@/store/useCartStore";
 import { Icon } from "@iconify/react";
 import { Input } from "../ui/input";

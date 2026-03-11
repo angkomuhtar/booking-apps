@@ -2,13 +2,6 @@ import PageHeader from "@/components/pos/page-header";
 import PosCart from "@/components/pos/pos-cart";
 import VenueCourt from "@/components/pos/venue-court";
 import VenueProduct from "@/components/pos/venue-product";
-import {
-  BanknoteArrowUp,
-  BanknoteX,
-  FolderArchive,
-  Pencil,
-  Trash,
-} from "lucide-react";
 import React from "react";
 
 const Page = async () => {

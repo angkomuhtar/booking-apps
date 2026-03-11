@@ -12,7 +12,6 @@ import { OrderStatus, OrderItemType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { checkItemsAvailability } from "../availability";
 import { snap } from "../midtrans";
-import { redirect } from "next/navigation";
 
 function generateOrderNumber({ type }: { type: string }): string {
   const timestamp = Date.now().toString(36).toUpperCase();

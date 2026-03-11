@@ -24,11 +24,7 @@ const VenueCourt = () => {
     moment().format("YYYY-MM-DD"),
   );
 
-  const {
-    data: court,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: court, isLoading } = useQuery({
     queryKey: ["pos.venue.court", selectedVenue?.id],
     queryFn: () => getVenueCourts(selectedVenue?.id ?? ""),
     enabled: !!selectedVenue?.id,

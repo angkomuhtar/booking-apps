@@ -7,12 +7,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import { BookUp, FolderArchive, Trash, X } from "lucide-react";
+import { BookUp, FolderArchive, Trash } from "lucide-react";
 import { useDraftPosStore } from "@/store/useDraftPosStore";
 import { usePosStore } from "@/store/usePosStore";
 
 const SheetDraft = () => {
-  const { draft, addtoDraft, getDraftById, removeDraft } = useDraftPosStore();
+  const { draft, removeDraft } = useDraftPosStore();
   const { addBulkToCart } = usePosStore();
 
   return (

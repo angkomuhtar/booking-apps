@@ -1,4 +1,4 @@
-import { hasPermission, requirePermission } from "@/lib/auth-helpers";
+import { requirePermission } from "@/lib/auth-helpers";
 import AddForm from "./add-form";
 import { getVenuesAsSelect } from "@/lib/actions/select";
 import { TableClient } from "./table-client";

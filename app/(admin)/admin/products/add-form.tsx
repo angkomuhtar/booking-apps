@@ -44,7 +44,6 @@ import { toast } from "sonner";
 import z from "zod";
 import imageCompression from "browser-image-compression";
 import { useQuery } from "@tanstack/react-query";
-import { Badge } from "@/components/ui/badge";
 
 const AddForm = ({ venues }: { venues: VenueSelect[] }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +63,7 @@ const AddForm = ({ venues }: { venues: VenueSelect[] }) => {
     },
   });
 
-  const { data: category = [], isLoading: loadCategory } = useQuery({
+  const { data: category = [] } = useQuery({
     queryKey: ["product-categories", selectedVenue],
     queryFn: async () => {
       const result = await getProductCategories(selectedVenue);

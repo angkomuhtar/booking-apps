@@ -4,10 +4,8 @@ import { getVenueProduct } from "@/lib/actions/venue";
 import { usePosStore } from "@/store/usePosStore";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { Skeleton } from "../ui/skeleton";
 import ProductCard from "./product-card";
 import ProductsLoad from "./product-load";
-import { Field, FieldLabel } from "../ui/field";
 import { ButtonGroup } from "../ui/button-group";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -16,11 +14,7 @@ const VenueProduct = () => {
   const { selectedVenue, activeCart } = usePosStore();
   const [query, setQuery] = useState<string>("");
 
-  const {
-    data: product,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: product, isLoading } = useQuery({
     queryKey: ["pos.venue.product", selectedVenue?.id, query],
     queryFn: () => getVenueProduct(selectedVenue!.id, query),
     enabled: !!selectedVenue?.id,
