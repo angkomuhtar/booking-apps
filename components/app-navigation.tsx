@@ -54,6 +54,8 @@ const AppNav = () => {
               </div>
             </Link>
 
+            {/* trigger action */}
+
             {!isMobile && (
               <nav className='nav-menu'>
                 <Link
