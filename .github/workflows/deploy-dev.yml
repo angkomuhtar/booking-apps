@@ -15,7 +15,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            cd /var/www/my-app
+            cd /var/www/app
             git pull origin dev
             sudo docker compose -f docker-compose.dev.yml down
             sudo docker compose -f docker-compose.dev.yml up -d --build
