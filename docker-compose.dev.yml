@@ -16,6 +16,8 @@ services:
 
   db-dev:
     image: postgres:17-alpine
+    ports:
+      - "5433:5432"
     env_file:
       - .env.dev
     volumes:
