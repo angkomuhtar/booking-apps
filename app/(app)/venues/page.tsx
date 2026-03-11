@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Card, CardContent } from "@/components/ui/card";
 import ProductCard from "@/components/custom-ui/product-card";
 import { getPopularVenues } from "@/lib/data/venue";
