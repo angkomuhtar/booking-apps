@@ -36,7 +36,7 @@ export async function getOrders(status?: OrderStatus) {
   try {
     const session = await requireAuth();
 
-    let where =
+    const where =
       status == "CREATED"
         ? {
             userId: session.user.id,

@@ -388,7 +388,7 @@ export async function getCourtWithBookings(courtId: string, date: Date) {
       },
       order: {
         status: {
-          in: ["WAIT_PAYMENT", "PAID", "PROCESSING"],
+          in: ["BOOKED", "COMPLETED"],
         },
       },
     },

@@ -1,8 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireVenueAccess } from "@/lib/auth-helpers";
 
-
-
 export async function getVenueById(id: string) {
   const venue = await prisma.venue.findUnique({
     where: { id },
@@ -186,7 +184,8 @@ export async function getVenueStats(venueId: string) {
       prisma.order.count({
         where: {
           venueId,
-          status: "WAIT_PAYMENT",
+          status: "CREATED",
+          paymentStatus: "UNPAID",
         },
       }),
     ]);
