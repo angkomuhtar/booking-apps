@@ -30,15 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const isSettlement = order.paymentStatus === "DP_PAID";
-    // const paymentAmount = isSettlement
-    //   ? (order.remainingAmount ?? 0)
-    //   : (order.dpAmount ?? order.totalPrice);
-    // const paymentType = isSettlement
-    //   ? "FULL_PAYMENT"
-    //   : order.dpAmount
-    //     ? "DOWN_PAYMENT"
-    //     : "FULL_PAYMENT";
+    const isSettlement = order.dpAmount && order.dpAmount > 0 ? false : true;
 
     await prisma.order.update({
       where: { id: orderId },
@@ -51,22 +43,9 @@ export async function POST(request: NextRequest) {
             : "FULLY_PAID",
         remainingAmount: isSettlement ? 0 : order.remainingAmount,
         paidAt: isSettlement ? order.paidAt : new Date(),
-        dpPaidAt:
-          !isSettlement && order.dpAmount ? new Date() : order.dpPaidAt,
+        dpPaidAt: !isSettlement && order.dpAmount ? new Date() : order.dpPaidAt,
       },
     });
-
-    // PaymentHistory dibuat dari webhook notification Midtrans
-    // prisma.paymentHistory.create({
-    //   data: {
-    //     orderId,
-    //     amount: paymentAmount,
-    //     paymentMethod: order.paymentMethod ?? "ONLINE",
-    //     paymentType,
-    //     transactionId: `${order.orderNumber}-${paymentType === "DOWN_PAYMENT" ? "DP" : "SETTLE"}`,
-    //     paidBy: session.user.id,
-    //   },
-    // }),
 
     return NextResponse.json({ success: true });
   } catch (error) {
