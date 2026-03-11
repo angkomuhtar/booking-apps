@@ -4,19 +4,18 @@ RUN apk add --no-cache libc6-compat openssl
 
 WORKDIR /app
 
-# Copy package files
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm ci
+RUN npm install
 
-# Copy semua file
 COPY . .
 
-# Generate Prisma Client
+# Tambahkan ARG & ENV sebelum build
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 RUN npx prisma generate
 
-# Build NextJS
 RUN npm run build
 
 EXPOSE 3000
