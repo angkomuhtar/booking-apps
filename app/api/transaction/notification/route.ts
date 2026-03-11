@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
     const midtransOrderId = statusResponse.order_id as string;
     const transactionStatus = statusResponse.transaction_status;
     const fraudStatus = statusResponse.fraud_status;
-    const grossAmount = parseFloat(statusResponse.gross_amount as string);
+    const grossAmount = parseFloat(
+      statusResponse.gross_amount as string,
+    ).toFixed(2);
 
     const [orderNumber, paymentSuffix] = midtransOrderId.split(/-(?=[^-]+$)/);
     const isSettlement = paymentSuffix === "SETTLE";
