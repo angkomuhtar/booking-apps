@@ -4,11 +4,14 @@ import PosSidebar from "@/components/pos/pos-sidebar";
 import { Avatar } from "@/components/ui/avatar";
 import VenueSwitcher from "@/components/venue-switcher";
 import { getAccessibleVenues, requirePermission } from "@/lib/auth-helpers";
+import { redirect } from "next/navigation";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
-  const accessibleVenues = await getAccessibleVenues();
   const session = await auth();
-
+  if (!session || session.user.role == "User") {
+    redirect("/login");
+  }
+  const accessibleVenues = await getAccessibleVenues();
   await requirePermission("pos.access");
 
   return (

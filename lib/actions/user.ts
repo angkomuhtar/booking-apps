@@ -1,3 +1,5 @@
+"use server";
+
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireSuperAdmin } from "@/lib/auth-helpers";
 

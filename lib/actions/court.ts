@@ -429,3 +429,35 @@ export async function getAvailableTimeSlots(courtId: string, date: Date) {
     bookedSlots,
   };
 }
+
+export async function getBookedSlots(courtIds: string[], date: string) {
+  try {
+    const bookedSlots = await prisma.orderItem.findMany({
+      where: {
+        itemType: "COURT_BOOKING",
+        itemId: { in: courtIds },
+        date: new Date(date),
+        order: {
+          OR: [
+            { status: "CREATED", payment_expireAt: { gt: new Date() } },
+            {
+              status: {
+                in: ["BOOKED", "COMPLETED"],
+              },
+            },
+          ],
+        },
+      },
+      select: {
+        itemId: true,
+        startTime: true,
+        endTime: true,
+      },
+    });
+
+    return bookedSlots;
+  } catch (error) {
+    console.error("Error fetching booked slots:", error);
+    throw new Error("Failed to fetch booked slots");
+  }
+}

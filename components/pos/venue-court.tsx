@@ -17,6 +17,7 @@ import {
 } from "../ui/accordion";
 import { generateTimeSlots } from "@/lib/utils";
 import { toast } from "sonner";
+import { getBookedSlots } from "@/lib/actions/court";
 
 const VenueCourt = () => {
   const { selectedVenue, addToCart, activeCart } = usePosStore();
@@ -29,6 +30,16 @@ const VenueCourt = () => {
     queryFn: () => getVenueCourts(selectedVenue?.id ?? ""),
     enabled: !!selectedVenue?.id,
   });
+
+  const courtIds = court?.data?.courts.map((court) => court.id) ?? [];
+
+  const { data: bookedSlots, isLoading: isLoadingBookedSlots } = useQuery({
+    queryKey: ["pos.venue.court.booked", courtIds, selectedDate],
+    queryFn: () => getBookedSlots(courtIds, selectedDate),
+    enabled: !!courtIds && !!selectedDate,
+  });
+
+  console.log("courtids", courtIds);
 
   return (
     <div className=''>
@@ -131,18 +142,18 @@ const VenueCourt = () => {
                         const isInCart = activeCart.some(
                           (cartItem) => cartItem.id === slot.id,
                         );
-                        // const isBooked = bookedSlots.some(
-                        //   (b) =>
-                        //     b.startTime === slot.startTime &&
-                        //     b.endTime === slot.endTime,
-                        // );
+                        const isBooked = bookedSlots?.some(
+                          (b) =>
+                            b.itemId === item.id &&
+                            b.startTime === slot.startTime &&
+                            b.endTime === slot.endTime,
+                        );
                         const isExpired = isBefore(
                           new Date(`${selectedDate}T${slot.startTime}`),
                           new Date(),
                         );
 
-                        const isDisabled = isExpired || isInCart;
-                        // const isDisabled = isInCart || isBooked || isExpired;
+                        const isDisabled = isExpired || isInCart || isBooked;
                         return (
                           <button
                             disabled={isDisabled}
@@ -186,11 +197,11 @@ const VenueCourt = () => {
                                 {slot.price.toLocaleString("id-ID")}
                               </span>
                             </span>
-                            {/* {isBooked && (
+                            {isBooked && (
                               <p className='text-xs text-red-500 font-medium'>
                                 Terpesan
                               </p>
-                            )} */}
+                            )}
                           </button>
                         );
                       })}

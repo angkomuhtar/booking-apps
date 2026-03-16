@@ -153,8 +153,6 @@ export async function hasPermission(permissionCode: string) {
     },
   });
 
-  console.log(user);
-
   if (!user?.role) return false;
 
   return true;

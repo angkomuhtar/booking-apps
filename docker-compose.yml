@@ -21,7 +21,7 @@ services:
     volumes:
       - pg_prod:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U palpadel -d palmpadel"]
+      test: ["CMD-SHELL", "pg_isready -U palmpadel -d palmpadel"]
       interval: 5s
       timeout: 5s
       retries: 5

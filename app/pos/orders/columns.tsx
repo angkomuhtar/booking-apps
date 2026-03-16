@@ -16,6 +16,9 @@ export type OrdersColumn = {
   totalPrice: number;
   status: string;
   notes: string | null;
+  paymentStatus: string;
+  dpAmount: number | null;
+  remainingAmount: number | null;
   venue: {
     name: string;
     id: string;
@@ -40,9 +43,9 @@ export type TableMeta = {
 const getStatusColor = (status: string) => {
   switch (status) {
     case "CREATED":
-      return { color: "bg-green-500", text: "Menunggu Pembayaran" };
-    case "WAIT_PAYMENT":
       return { color: "bg-yellow-500", text: "Menunggu Pembayaran" };
+    case "BOOKED":
+      return { color: "bg-green-500", text: "Booked" };
     case "PAID":
       return { color: "bg-green-500", text: "Pembayaran Berhasil" };
     case "CANCELLED":
@@ -108,7 +111,7 @@ export const columns: ColumnDef<OrdersColumn>[] = [
     accessorKey: "totalPrice",
     header: "Total",
     cell: ({ row }) => {
-      return `Rp ${row.original.totalPrice.toLocaleString()}`;
+      return `Rp ${row.original.totalPrice.toLocaleString("id-ID")}`;
     },
   },
   {
@@ -121,6 +124,29 @@ export const columns: ColumnDef<OrdersColumn>[] = [
           {statusInfo.text}
         </span>
       );
+    },
+  },
+  {
+    accessorKey: "Status Bayar",
+    cell: ({ row }) => {
+      const paymentStatus = row.original.paymentStatus;
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium text-white ${paymentStatus === "UNPAID" ? "bg-yellow-500" : paymentStatus === "DP_PAID" ? "bg-blue-500" : "bg-green-500"}`}>
+          {paymentStatus === "DP_PAID"
+            ? "Down Payment"
+            : paymentStatus === "FULLY_PAID"
+              ? "Lunas"
+              : "Menunggu Pembayaran"}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "Sisa Bayar",
+    cell: ({ row }) => {
+      const remainingAmount = row.original.remainingAmount ?? 0;
+      return `Rp ${remainingAmount.toLocaleString("id-ID")}`;
     },
   },
   {

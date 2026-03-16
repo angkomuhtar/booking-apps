@@ -92,11 +92,11 @@ const AppFooter = () => {
               </li>
               <li className='flex items-center gap-2'>
                 <Mail className='h-4 w-4' />
-                support@ayobooking.com
+                support@palmpadel.id
               </li>
               <li className='flex items-center gap-2'>
                 <MapPin className='h-4 w-4' />
-                Jakarta, Indonesia
+                Samarinda, Indonesia
               </li>
             </ul>
           </div>

@@ -107,7 +107,7 @@ export async function getBookedSlots(courtIds: string[], date: string) {
         date: new Date(date),
         order: {
           OR: [
-            { status: "CREATED", paymentStatus: "UNPAID" as const },
+            { status: "CREATED", payment_expireAt: { gt: new Date() } },
             {
               status: {
                 in: ["BOOKED", "COMPLETED"],

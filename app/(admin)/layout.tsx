@@ -9,15 +9,14 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import React from "react";
 import AppBreadcrumb from "@/components/app-breadcrumb";
+import { requirePermission } from "@/lib/auth-helpers";
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
   if (!session || session.user.role == "User") {
     redirect("/login");
   }
 
-  console.log("session", session.user);
-
-  // await requirePermission("admin.access");
+  await requirePermission("admin.access");
 
   return (
     <SidebarProvider>

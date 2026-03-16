@@ -169,6 +169,9 @@ export async function getOrders() {
         status: true,
         notes: true,
         createdAt: true,
+        remainingAmount: true,
+        paymentStatus: true,
+        dpAmount: true,
         user: {
           select: {
             id: true,

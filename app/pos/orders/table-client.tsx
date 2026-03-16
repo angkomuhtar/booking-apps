@@ -32,12 +32,12 @@ export function TableClient() {
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
+      <div className='space-y-3'>
+        <Skeleton className='h-10 w-full' />
+        <Skeleton className='h-10 w-full' />
+        <Skeleton className='h-10 w-full' />
+        <Skeleton className='h-10 w-full' />
+        <Skeleton className='h-10 w-full' />
       </div>
     );
   }
@@ -61,18 +61,19 @@ export function TableClient() {
     onStatusChange: handleStatusChange,
   };
 
-  const filteredOrders = orders.filter((order) =>
-    order.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
-    order.user.name.toLowerCase().includes(search.toLowerCase()) ||
-    order.venue.name.toLowerCase().includes(search.toLowerCase())
+  const filteredOrders = orders.filter(
+    (order) =>
+      order.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
+      order.user.name.toLowerCase().includes(search.toLowerCase()) ||
+      order.venue.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <>
       {isMobile ? (
-        <div className="space-y-3">
+        <div className='space-y-3'>
           <Input
-            placeholder="Cari Data Order..."
+            placeholder='Cari Data Order...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -85,7 +86,7 @@ export function TableClient() {
               />
             ))
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className='text-center py-8 text-muted-foreground'>
               Tidak ada data
             </div>
           )}
@@ -94,8 +95,8 @@ export function TableClient() {
         <DataTable
           columns={columns}
           data={orders}
-          searchKey="orderNumber"
-          searchPlaceholder="Cari Data Order..."
+          searchKey='orderNumber'
+          searchPlaceholder='Cari Data Order...'
           meta={meta}
         />
       )}

@@ -8,6 +8,19 @@ const nextConfig: NextConfig = {
     },
     authInterrupts: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+      },
+      // Tambahkan domain lain kalau ada
+      {
+        protocol: "https",
+        hostname: "*.palmpadel.id", // untuk avatar github
+      },
+    ],
+  },
 };
 
 export default nextConfig;
