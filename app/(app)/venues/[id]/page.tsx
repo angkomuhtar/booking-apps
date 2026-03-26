@@ -14,7 +14,7 @@ import VenueReview from "@/components/venue-review";
 import { notFound } from "next/navigation";
 import VenueCourtSection from "./venue-court-section";
 import ContentEditor from "@/components/tiptap-templates/simple/editor-content";
-import { getVenueById } from "@/lib/data/venue";
+import { getVenueById } from "@/lib/actions/client/venue";
 import ProductSelection from "./product-selection";
 
 interface PageProps {
@@ -80,58 +80,6 @@ const Page = async ({ params }: PageProps) => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      {/* <div className='grid grid-cols-2 md:grid-cols-4 gap-2 relative'>
-        {venue.venueImages.length > 0 ? (
-          venue.venueImages
-            .slice(0, 5)
-            .map((image, index) => (
-              <img
-                key={image.id}
-                src={image.imageUrl}
-                alt={`${venue.name} - ${index + 1}`}
-                className={`rounded-lg object-cover ${
-                  index === 0 ? "col-span-2 md:row-span-2" : "h-full"
-                }`}
-              />
-            ))
-        ) : (
-          <>
-            <img
-              src='/image/venue-1.jpg'
-              alt='Venue Banner'
-              className='rounded-lg first:col-span-2 md:first:row-span-2 object-cover not-first:h-full'
-            />
-            <img
-              src='/image/venue-2.jpeg'
-              alt='Venue Banner'
-              className='rounded-lg object-cover h-full'
-            />
-            <img
-              src='/image/venue-3.jpeg'
-              alt='Venue Banner'
-              className='rounded-lg object-cover h-full'
-            />
-            <img
-              src='/image/venue-4.jpg'
-              alt='Venue Banner'
-              className='rounded-lg object-cover h-full'
-            />
-            <img
-              src='/image/venue-5.jpg'
-              alt='Venue Banner'
-              className='rounded-lg object-cover h-full'
-            />
-          </>
-        )}
-        {venue.venueImages.length > 5 && (
-          <button
-            type='button'
-            className='absolute right-0 bottom-0 bg-black/60 text-white text-sm px-4 py-2 rounded-md m-4 cursor-pointer capitalize font-semibold'>
-            Lihat semua
-          </button>
-        )}
-      </div> */}
-
       <div className='grid grid-cols-2 md:grid-flow-col md:grid-cols-4 gap-2 relative'>
         {venue.venueImages.length > 0 &&
           venue.venueImages
@@ -260,14 +208,13 @@ const Page = async ({ params }: PageProps) => {
       </section>
 
       <VenueCourtSection
-        courts={venue.courts}
         venueId={venue.id}
         venueName={venue.name}
         startTime={venue.openingTime}
         endTime={venue.closingTime}
       />
 
-      <ProductSelection venueId={venue.id} products={venue.products || []} />
+      <ProductSelection venueId={venue.id} />
     </main>
   );
 };

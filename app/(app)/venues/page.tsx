@@ -1,11 +1,11 @@
 export const dynamic = "force-dynamic";
 import { Card, CardContent } from "@/components/ui/card";
 import ProductCard from "@/components/custom-ui/product-card";
-import { getPopularVenues } from "@/lib/data/venue";
+import { getAllVenues } from "@/lib/actions/venue";
 import CustButton from "@/components/custom-ui/cust-button";
 
 export default async function VenuesPage() {
-  const venues = await getPopularVenues();
+  const { data: venues } = await getAllVenues();
 
   return (
     <div className='min-h-screen bg-background'>
@@ -68,26 +68,6 @@ export default async function VenuesPage() {
                 <option value='Balikpapan'>Balikpapan</option>
               </select>
             </div>
-            {/* 
-            <Popover>
-              <PopoverTrigger
-                asChild
-                className='rounded-full px-6 py-4 bg-white shadow-sm'>
-                <div className='flex items-center justify-between cursor-pointer font-light text-sm'>
-                  <span>Pilih Tanggal</span>
-                  <CalendarIcon className='h-4 w-4' />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className='p-0 '>
-                <Calendar
-                  mode='single'
-                  captionLayout='dropdown'
-                  className='w-full'
-                />
-              </PopoverContent>
-            </Popover> */}
-
-            {/* <LiquidButton>Liquid Button</LiquidButton> */}
             <div className='col-span-2'>
               <CustButton />
             </div>

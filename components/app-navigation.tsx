@@ -33,7 +33,7 @@ const AppNav = () => {
 
   const isMobile = useIsMobile();
 
-  console.log("from isMobile", isMobile, pathname);
+  // console.log("from isMobile", isMobile, pathname);
 
   return (
     <>

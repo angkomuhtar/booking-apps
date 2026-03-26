@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Icon } from "@iconify/react";
-import { getVenues } from "@/lib/actions/venue";
+import { getVenuesByAdmin } from "@/lib/actions/venue";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
 
@@ -13,14 +13,7 @@ export default async function AdminVenuesPage() {
     redirect("/login");
   }
 
-  // if (
-  //   session.user.role !== "SUPER_ADMIN" &&
-  //   session.user.role !== "VENUE_ADMIN"
-  // ) {
-  //   redirect("/");
-  // }
-
-  const result = await getVenues();
+  const result = await getVenuesByAdmin();
   console.log(result.data);
 
   return (

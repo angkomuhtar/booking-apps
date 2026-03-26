@@ -31,15 +31,13 @@ const VenueCourt = () => {
     enabled: !!selectedVenue?.id,
   });
 
-  const courtIds = court?.data?.courts.map((court) => court.id) ?? [];
+  const courtIds = court?.data?.map((c) => c.id) ?? [];
 
   const { data: bookedSlots, isLoading: isLoadingBookedSlots } = useQuery({
     queryKey: ["pos.venue.court.booked", courtIds, selectedDate],
     queryFn: () => getBookedSlots(courtIds, selectedDate),
     enabled: !!courtIds && !!selectedDate,
   });
-
-  console.log("courtids", courtIds);
 
   return (
     <div className=''>
@@ -124,7 +122,7 @@ const VenueCourt = () => {
                 collapsible
                 className='w-full'
                 defaultValue='item-0'>
-                {court.data.courts.map((item, index) => (
+                {court.data.map((item, index) => (
                   <AccordionItem
                     value={`item-${index}`}
                     className='w-full border border-teal-200 rounded-lg bg-white shadow-sm mb-4'
@@ -135,8 +133,8 @@ const VenueCourt = () => {
                     <AccordionContent className='grid gap-4 grid-cols-2 md:grid-cols-5 py-6 px-4'>
                       {generateTimeSlots(
                         item,
-                        court.data.openingTime,
-                        court.data.closingTime,
+                        item.venue.openingTime,
+                        item.venue.closingTime,
                         selectedDate,
                       ).map((slot) => {
                         const isInCart = activeCart.some(

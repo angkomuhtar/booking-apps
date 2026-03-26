@@ -1,54 +1,5 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getPopularVenues() {
-  const venues = await prisma.venue.findMany({
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      address: true,
-      city: true,
-      province: true,
-      totalReviews: true,
-      rating: true,
-      venueImages: {
-        where: { isPrimary: true },
-        take: 1,
-      },
-      createdAt: true,
-      _count: {
-        select: { courts: true },
-      },
-      courts: {
-        where: { isActive: true },
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          courtType: true,
-          pricePerHour: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return venues.map((venue) => {
-    const lowestPrice =
-      venue.courts.length > 0
-        ? Math.min(...venue.courts.map((court) => Number(court.pricePerHour)))
-        : null;
-
-    return {
-      ...venue,
-      lowestPrice,
-      courtTypes: [
-        ...new Set(venue.courts.map((court) => court.courtType?.name)),
-      ],
-    };
-  });
-}
-
 export async function getVenues() {
   const venues = await prisma.venue.findMany({
     select: {
@@ -96,39 +47,6 @@ export async function getVenues() {
       ],
     };
   });
-}
-
-export async function getBookedSlots(courtIds: string[], date: string) {
-  try {
-    const bookedSlots = await prisma.orderItem.findMany({
-      where: {
-        itemType: "COURT_BOOKING",
-        itemId: { in: courtIds },
-        date: new Date(date),
-        order: {
-          OR: [
-            { status: "CREATED", payment_expireAt: { gt: new Date() } },
-            {
-              status: {
-                in: ["BOOKED", "COMPLETED"],
-              },
-            },
-          ],
-          //
-        },
-      },
-      select: {
-        itemId: true,
-        startTime: true,
-        endTime: true,
-      },
-    });
-
-    return bookedSlots;
-  } catch (error) {
-    console.error("Get booked slots error:", error);
-    return [];
-  }
 }
 
 export async function getVenueById(venueId: string) {

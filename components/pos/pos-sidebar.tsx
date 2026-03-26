@@ -25,8 +25,6 @@ const PosSidebar = () => {
 
   const pathname = usePathname();
 
-  console.log(pathname);
-
   return (
     <div className='bg-white py-2 px-4 border-r shadow-xs w-64 flex flex-col justify-between min-h-screen'>
       {/* Additional POS navigation items can go here */}

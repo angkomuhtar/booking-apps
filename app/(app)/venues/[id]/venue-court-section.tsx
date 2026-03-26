@@ -18,7 +18,8 @@ import {
 import { useCartStore } from "@/store/useCartStore";
 import { useState, useEffect, useCallback } from "react";
 import CourtItem from "./court-item";
-import { Court } from "@/types";
+import { useCourts } from "@/hooks/data/use-venues";
+import { useGetBookedSlots } from "@/hooks/data/use-courts";
 
 interface BookedSlot {
   itemId: string;
@@ -27,7 +28,6 @@ interface BookedSlot {
 }
 
 interface VenueCourtSectionProps {
-  courts: Court[];
   venueId: string;
   venueName: string;
   startTime?: string;
@@ -35,7 +35,6 @@ interface VenueCourtSectionProps {
 }
 
 export default function VenueCourtSection({
-  courts,
   venueId,
   venueName,
   startTime,
@@ -46,24 +45,13 @@ export default function VenueCourtSection({
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD"),
   );
-  const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([]);
 
-  const fetchBookedSlots = useCallback(async () => {
-    const courtIds = courts.map((c) => c.id);
-    const res = await fetch(
-      `/api/venues/booked-slots?courtIds=${courtIds.join(",")}&date=${selectedDate}`,
-    );
-    if (res.ok) {
-      const data = await res.json();
-      setBookedSlots(data);
-    }
-  }, [courts, selectedDate]);
+  const { data: courts, isLoading } = useCourts(venueId);
+  const courtIds = courts?.data?.map((court) => court.id) ?? [];
+  const { data: bookedSlots, isLoading: isLoadingBookedSlots } =
+    useGetBookedSlots(courtIds, selectedDate);
 
-  useEffect(() => {
-    fetchBookedSlots();
-  }, [fetchBookedSlots]);
-
-  if (courts.length === 0) {
+  if (courts?.data?.length === 0) {
     return null;
   }
 
@@ -148,7 +136,7 @@ export default function VenueCourtSection({
         </div>
       </div>
 
-      {courts
+      {courts?.data
         .filter((c) => c.isActive)
         .map((court, index) => (
           <CourtItem
@@ -159,7 +147,9 @@ export default function VenueCourtSection({
             selectedDate={selectedDate}
             startTime={startTime}
             endTime={endTime}
-            bookedSlots={bookedSlots.filter((s) => s.itemId === court.id)}
+            bookedSlots={
+              bookedSlots?.filter((s) => s.itemId === court.id) ?? []
+            }
           />
         ))}
     </section>

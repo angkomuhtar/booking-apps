@@ -29,6 +29,7 @@ import {
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { createOrder } from "@/lib/data/orders";
+import { isBefore } from "date-fns";
 
 const CartList = () => {
   const {
@@ -73,6 +74,7 @@ const CartList = () => {
         endTime: item.endTime,
         duration: item.duration,
       }));
+
       const itemsPro = products.map((item) => ({
         itemType: item.itemType,
         itemId: item.itemId,
@@ -80,6 +82,27 @@ const CartList = () => {
         price: item.price,
         quantity: item.quantity,
       }));
+
+      let hasPastSession = false;
+
+      itemsCourt.forEach((item) => {
+        if (isBefore(new Date(`${item.date}T${item.startTime}`), new Date())) {
+          // toast.error(
+          //   `Sesi ${item.name} pada ${moment(item.date).format(
+          //     "DD MMM YYYY",
+          //   )} pukul ${item.startTime} sudah lewat`,
+          // );
+          // throw new Error("Sesi sudah lewat");
+          hasPastSession = true;
+        }
+      });
+
+      if (hasPastSession) {
+        toast.error(
+          `Terdapat sesi yang sudah lewat. Pastikan semua sesi yang dipesan berada di waktu yang akan datang.`,
+        );
+        return;
+      }
 
       const result = await createOrder({
         venueId,
@@ -100,8 +123,12 @@ const CartList = () => {
           toast.error(result.message);
         }
       }
-    } catch {
-      toast.error("Gagal membuat order");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Gagal membuat order");
+      }
     } finally {
       setIsCheckingOut(false);
     }

@@ -6,6 +6,7 @@ import { OrderItemType, OrderStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { checkItemsAvailability } from "../availability";
 import { snap } from "../midtrans";
+import { log } from "console";
 
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -87,6 +88,7 @@ export async function createOrder(input: CreateOrderInput) {
     }
 
     const availability = await checkItemsAvailability(input.items);
+
     if (!availability.available) {
       const reasons = availability.unavailableItems
         .map((item) => `${item.name}: ${item.reason}`)

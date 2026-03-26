@@ -205,7 +205,15 @@ const PosCart = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <button className='flex-1 bg-teal-500 text-white text-xs py-1.5 rounded-md font-semibold cursor-pointer flex items-center justify-center gap-2'>
+        <button
+          disabled={
+            getItemsByType("COURT_BOOKING").length == 0 &&
+            getItemsByType("PRODUCT").length == 0
+          }
+          onClick={() => {
+            console.log("test Bayar");
+          }}
+          className='flex-1 bg-teal-500 text-white text-xs py-1.5 rounded-md font-semibold cursor-pointer flex items-center justify-center gap-2'>
           <BanknoteArrowUp className='size-4' />
           Bayar
         </button>

@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { useGetProducts } from "@/hooks/data/use-venues";
 import { useCartStore } from "@/store/useCartStore";
 import { Icon } from "@iconify/react";
 import React from "react";
@@ -14,14 +15,10 @@ type ProductType = {
   stock: number;
 };
 
-const ProductSelection = ({
-  venueId,
-  products,
-}: {
-  venueId: string;
-  products: ProductType[];
-}) => {
+const ProductSelection = ({ venueId }: { venueId: string }) => {
   const { addItem } = useCartStore();
+
+  const { data: products, isLoading } = useGetProducts(venueId);
 
   return (
     <section className='mt-6 py-4'>
@@ -33,8 +30,8 @@ const ProductSelection = ({
       </div>
 
       <div className='grid grid-cols-2 md:grid-cols-4 mt-6 gap-4'>
-        {products &&
-          products.map((product, index) => (
+        {products?.success &&
+          products?.data?.map((product, index) => (
             <div
               className='grow flex flex-col justify-between p-2.5 gap-4 border rounded-xl'
               key={index}>

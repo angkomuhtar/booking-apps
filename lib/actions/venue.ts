@@ -257,7 +257,7 @@ export async function getFacilities() {
   }
 }
 
-export async function getVenues() {
+export async function getVenuesByAdmin() {
   try {
     const venueslist = await getAccessibleVenueIds();
 
@@ -356,33 +356,139 @@ export async function getVenueProduct(venueId: string, query?: string) {
 
 export async function getVenueCourts(venueId: string) {
   try {
-    const venue = await prisma.venue.findUnique({
-      where: { id: venueId },
+    const venue = await prisma.court.findMany({
+      where: { venueId: venueId },
       include: {
-        city: true,
-        province: true,
-        courts: {
-          include: {
-            courtType: true,
-            floorType: true,
-            pricing: true,
-            courtImages: true,
-          },
-        },
+        courtType: true,
+        floorType: true,
+        pricing: true,
+        courtImages: true,
+        venue: true,
       },
     });
 
     if (!venue) {
-      return { success: false, data: null, message: "Venue tidak ditemukan" };
+      return { success: false, data: [], message: "Courts tidak ditemukan" };
     }
 
     return { success: true, data: venue };
   } catch (error) {
-    console.error("Get venue by ID error:", error);
+    console.error("Get venue courts error:", error);
     return {
       success: false,
-      data: null,
-      message: "Gagal mengambil data venue",
+      data: [],
+      message: "Gagal mengambil data courts",
+    };
+  }
+}
+
+export async function getPopularVenues() {
+  const venues = await prisma.venue.findMany({
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      address: true,
+      city: true,
+      province: true,
+      totalReviews: true,
+      rating: true,
+      venueImages: {
+        where: { isPrimary: true },
+        take: 1,
+      },
+      createdAt: true,
+      _count: {
+        select: { courts: true },
+      },
+      courts: {
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          courtType: true,
+          pricePerHour: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return venues.map((venue) => {
+    const lowestPrice =
+      venue.courts.length > 0
+        ? Math.min(...venue.courts.map((court) => Number(court.pricePerHour)))
+        : null;
+
+    return {
+      ...venue,
+      lowestPrice,
+      courtTypes: [
+        ...new Set(venue.courts.map((court) => court.courtType?.name)),
+      ],
+    };
+  });
+}
+
+export async function getAllVenues() {
+  try {
+    const venues = await prisma.venue.findMany({
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        address: true,
+        city: true,
+        province: true,
+        totalReviews: true,
+        rating: true,
+        venueImages: {
+          where: { isPrimary: true },
+          take: 1,
+        },
+        createdAt: true,
+        _count: {
+          select: { courts: true },
+        },
+        courts: {
+          where: { isActive: true },
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            courtType: true,
+            pricePerHour: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const formattedVenues = venues.map((venue) => {
+      const lowestPrice =
+        venue.courts.length > 0
+          ? Math.min(...venue.courts.map((court) => Number(court.pricePerHour)))
+          : null;
+
+      return {
+        ...venue,
+        lowestPrice,
+        courtTypes: [
+          ...new Set(venue.courts.map((court) => court.courtType?.name)),
+        ],
+      };
+    });
+    return {
+      success: true,
+      data: formattedVenues,
+    };
+  } catch (error) {
+    console.error("Get all venues error:", error);
+    return {
+      success: false,
+      data: [],
+      message: "Gagal mengambil data venues",
     };
   }
 }

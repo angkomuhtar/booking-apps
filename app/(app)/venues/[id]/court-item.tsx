@@ -104,12 +104,6 @@ const CourtItem = ({
                     new Date(),
                   );
 
-                  console.log(
-                    "SLOTT",
-                    new Date(`${selectedDate}T${slot.startTime}`),
-                    isExpired,
-                  );
-
                   const isDisabled = isInCart || isBooked || isExpired;
                   return (
                     <button
